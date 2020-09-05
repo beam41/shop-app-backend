@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -11,13 +12,37 @@ namespace ShopAppBackend.Models
     {
         public int Id { get; set; }
 
-        public string Name { get; set; }
+        [Required(AllowEmptyStrings = false)]
+        [Column(TypeName = "varchar(64)")]
+        [StringLength(64)]
+        public string Username { get; set; }
 
-        public string LastName { get; set; }
-
-        public string Email { get; set; }
-
+        [Required(AllowEmptyStrings = false)]
+        [Column(TypeName = "char(44)")]
+        [StringLength(44)]
         public string Password { get; set; }
+
+        [Required(AllowEmptyStrings = false)]
+        [Column(TypeName = "char(10)")]
+        [StringLength(10)]
+        public string PhoneNumber { get; set; }
+
+        public string FullName { get; set; }
+
+        public string Address { get; set; }
+
+        [Column(TypeName = "varchar(32)")]
+        public string Province { get; set; }
+
+        [Column(TypeName = "varchar(32)")]
+        public string District { get; set; }
+
+        [Column(TypeName = "varchar(32)")]
+        public string SubDistrict { get; set; }
+
+        [Column(TypeName = "char(5)")]
+        [StringLength(5)]
+        public string PostalCode { get; set; }
 
         [NotMapped]
         public string Token { get; set; }

@@ -32,6 +32,7 @@ namespace ShopAppBackend.Controllers
 
         // GET: api/Users
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<User>>> GetUser()
         {
             return await _context.User.ToListAsync();
@@ -80,7 +81,7 @@ namespace ShopAppBackend.Controllers
                 numBytesRequested: 32));
 
             User user = _context.User.Where(u =>
-                u.Email == userBody.Email &&
+                u.Username == userBody.Username &&
                 u.Password == passwordHash
             ).FirstOrDefault();
 

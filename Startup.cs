@@ -31,7 +31,7 @@ namespace ShopAppBackend
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<DatabaseContext>(options => options.UseSqlite($"Data Source={Configuration["DatabaseLocation"]}"));
+            services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(Configuration["ConnectionString"]));
 
             var userSettingsSection = Configuration.GetSection(nameof(UserSettings));
             services.Configure<UserSettings>(userSettingsSection);
@@ -59,6 +59,10 @@ namespace ShopAppBackend
                     ValidateAudience = false
                 };
             });
+
+            services.AddControllers().AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            );
 
             services.AddControllers();
         }

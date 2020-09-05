@@ -16,7 +16,27 @@ namespace ShopAppBackend.Models.Context
             Database.EnsureCreated();
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>()
+                .HasAlternateKey(u => u.Username);
+
+            modelBuilder.Entity<Product>()
+                .HasOne(p => p.Type)
+                .WithMany(t => t.Products);
+
+            modelBuilder.Entity<Product>()
+                .HasMany(p => p.ProductImages)
+                .WithOne(pi => pi.Product);
+        }
+
         public DbSet<User> User { get; set; }
+
+        public DbSet<ProductType> ProductType { get; set; }
+
+        public DbSet<Product> Product { get; set; }
+
+        public DbSet<ProductImage> ProductImage { get; set; }
         
     }
 }

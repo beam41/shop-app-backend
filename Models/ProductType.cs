@@ -15,4 +15,13 @@ namespace ShopAppBackend.Models
 
         public ICollection<Product> Products { get; set; }
     }
+
+    public class ProductTypeDisplayDTO
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public ICollection<ProductDisplayDTO> ProductList { get; set; }
+    }
 }

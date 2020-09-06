@@ -72,6 +72,28 @@ namespace ShopAppBackend.Controllers
             return await query.Take(int.Parse(Request.Query["amount"])).ToListAsync();
         }
 
+        [HttpGet("type")]
+        public async Task<ActionResult<IEnumerable<ProductTypeDisplayDTO>>> GetAllTypeAndProduct()
+        {
+            return await _context.ProductType
+                .Where(pt => pt.Products.Count() > 0)
+                .Select(pt => new ProductTypeDisplayDTO
+                {
+                    Id = pt.Id,
+                    Name = pt.Name,
+                    ProductList = (ICollection<ProductDisplayDTO>) pt.Products
+                        .Select(p => new ProductDisplayDTO
+                        {
+                            Id = p.Id,
+                            Name = p.Name,
+                            Price = p.Price,
+                            NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted).NewPrice,
+                        })
+                        .Take(int.Parse(Request.Query["amount"]))
+                })
+                .ToListAsync();
+        }
+
         // GET: api/Products/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProduct(int id)

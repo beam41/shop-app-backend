@@ -94,6 +94,29 @@ namespace ShopAppBackend.Controllers
                 .ToListAsync();
         }
 
+        [HttpGet("promotion")]
+        public async Task<ActionResult<IEnumerable<PromotionDisplayDTO>>> GetAllPromotionAndProduct()
+        {
+            return await _context.Promotion
+                .Where(p => p.IsBroadcasted)
+                .Select(p => new PromotionDisplayDTO
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Description = p.Description,
+                    ProductList = (ICollection<ProductDisplayDTO>) p.PromotionItems
+                        .Where(pi => pi.InPromotionProduct.IsVisible)
+                        .Select(pro => new ProductDisplayDTO
+                        {
+                            Id = pro.InPromotionProduct.Id,
+                            Name = pro.InPromotionProduct.Name,
+                            Price = pro.InPromotionProduct.Price,
+                            NewPrice = pro.NewPrice,
+                        })
+                })
+                .ToListAsync();
+        }
+
         // GET: api/Products/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProduct(int id)

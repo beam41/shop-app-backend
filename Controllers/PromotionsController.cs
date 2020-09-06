@@ -22,33 +22,10 @@ namespace ShopAppBackend.Controllers
         }
 
         // GET: api/Promotions
-        [HttpGet("debug")]
-        public async Task<ActionResult<IEnumerable<Promotion>>> GetPromotionDebug()
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Promotion>>> GetPromotion()
         {
             return await _context.Promotion.Include(p => p.PromotionItems).ToListAsync();
-        }
-
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<PromotionDisplayDTO>>> GetPromotion()
-        {
-            return await _context.Promotion
-                .Where(p => p.IsBroadcasted)
-                .Select(p => new PromotionDisplayDTO 
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Description = p.Description,
-                    ProductList = (ICollection<ProductDisplayDTO>) p.PromotionItems
-                        .Where(pi => pi.InPromotionProduct.IsVisible)
-                        .Select(pro => new ProductDisplayDTO
-                        {
-                            Id = pro.InPromotionProduct.Id,
-                            Name = pro.InPromotionProduct.Name,
-                            Price = pro.InPromotionProduct.Price,
-                            NewPrice = pro.NewPrice,
-                        })
-                })
-                .ToListAsync();
         }
 
         // GET: api/Promotions/5

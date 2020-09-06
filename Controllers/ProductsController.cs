@@ -54,6 +54,11 @@ namespace ShopAppBackend.Controllers
         [HttpGet("type/{type}")]
         public async Task<ActionResult<IEnumerable<ProductDisplayDTO>>> GetByType(string type)
         {
+            if (!ProductTypeExists(type))
+            {
+                return NotFound();
+            }
+
             var query = _context.Product
                 .Where(p => p.IsVisible && p.Type.Name == type)
                 .Select(p => new ProductDisplayDTO
@@ -147,6 +152,11 @@ namespace ShopAppBackend.Controllers
         private bool ProductExists(int id)
         {
             return _context.Product.Any(e => e.Id == id);
+        }
+
+        private bool ProductTypeExists(string name)
+        {
+            return _context.ProductType.Any(e => e.Name == name);
         }
     }
 }

@@ -12,17 +12,17 @@ namespace ShopAppBackend.Models
     {
         public int Id { get; set; }
 
-        [Required(AllowEmptyStrings = false)]
+        [Required]
         [Column(TypeName = "varchar(64)")]
         [StringLength(64)]
         public string Username { get; set; }
 
-        [Required(AllowEmptyStrings = false)]
+        [Required]
         [Column(TypeName = "char(44)")]
         [StringLength(44)]
         public string Password { get; set; }
 
-        [Required(AllowEmptyStrings = false)]
+        [Required]
         [Column(TypeName = "char(10)")]
         [StringLength(10)]
         public string PhoneNumber { get; set; }

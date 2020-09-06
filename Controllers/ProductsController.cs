@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
 using ShopAppBackend.Models;
 using ShopAppBackend.Models.Context;
 
@@ -21,11 +23,53 @@ namespace ShopAppBackend.Controllers
             _context = context;
         }
 
-        // GET: api/Products
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProduct()
         {
-            return await _context.Product.Include(p => p.ProductImages).Include(p => p.Type).ToListAsync();
+            return await _context.Product
+                .Include(p => p.ProductImages)
+                .Include(p => p.Type)
+                .Include(p => p.PromotionItems)
+                .ThenInclude(pi => pi.Promotion)
+                .ToListAsync();
+        }
+
+        [HttpGet("recommend")]
+        public async Task<ActionResult<IEnumerable<ProductDisplayDTO>>> GetRecommend()
+        {
+            return await _context.Product
+                .Where(p => p.IsVisible)
+                .Select(p => new ProductDisplayDTO
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Price = p.Price,
+                    NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted).NewPrice,
+                })
+                .OrderBy(p => Guid.NewGuid())
+                .Take(int.Parse(Request.Query["amount"]))
+                .ToListAsync();
+        }
+
+        [HttpGet("type/{type}")]
+        public async Task<ActionResult<IEnumerable<ProductDisplayDTO>>> GetByType(string type)
+        {
+            var query = _context.Product
+                .Where(p => p.IsVisible && p.Type.Name == type)
+                .Select(p => new ProductDisplayDTO
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Price = p.Price,
+                    NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted).NewPrice,
+                });
+
+            if (Request.Query["amount"] == StringValues.Empty)
+            {
+                return await query.ToListAsync();
+            }
+
+            return await query.Take(int.Parse(Request.Query["amount"])).ToListAsync();
         }
 
         // GET: api/Products/5
@@ -42,66 +86,17 @@ namespace ShopAppBackend.Controllers
             return product;
         }
 
-        // PUT: api/Products/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutProduct(int id, Product product)
-        {
-            if (id != product.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(product).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ProductExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Products
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
         public async Task<ActionResult<Product>> PostProduct(ProductFormDTO product)
         {
             var type = new ProductType { Id = product.TypeId };
             _context.Attach(type);
-            type.Products = new List<Product>{ product };
+            Product newProduct = product;
+            newProduct.Type = type;
+            _context.Product.Add(newProduct);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetProduct", new { id = product.Id }, product);
-        }
-
-        // DELETE: api/Products/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Product>> DeleteProduct(int id)
-        {
-            var product = await _context.Product.FindAsync(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            _context.Product.Remove(product);
-            await _context.SaveChangesAsync();
-
-            return product;
+            return CreatedAtAction("GetProduct", new { id = newProduct.Id }, newProduct);
         }
 
         private bool ProductExists(int id)

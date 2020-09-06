@@ -10,7 +10,7 @@ using ShopAppBackend.Models.Context;
 
 namespace ShopAppBackend.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/types")]
     [ApiController]
     public class ProductTypesController : ControllerBase
     {

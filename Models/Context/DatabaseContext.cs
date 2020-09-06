@@ -11,6 +11,7 @@ namespace ShopAppBackend.Models.Context
 {
     public class DatabaseContext : DbContext
     {
+
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) 
         {
             Database.EnsureCreated();
@@ -28,6 +29,14 @@ namespace ShopAppBackend.Models.Context
             modelBuilder.Entity<Product>()
                 .HasMany(p => p.ProductImages)
                 .WithOne(pi => pi.Product);
+
+            modelBuilder.Entity<PromotionItem>()
+                .HasOne(pi => pi.Promotion)
+                .WithMany(p => p.PromotionItems);
+
+            modelBuilder.Entity<PromotionItem>()
+                .HasOne(pi => pi.InPromotionProduct)
+                .WithMany(p => p.PromotionItems);
         }
 
         public DbSet<User> User { get; set; }
@@ -37,6 +46,10 @@ namespace ShopAppBackend.Models.Context
         public DbSet<Product> Product { get; set; }
 
         public DbSet<ProductImage> ProductImage { get; set; }
-        
+
+        public DbSet<Promotion> Promotion { get; set; }
+
+        public DbSet<PromotionItem> PromotionItem { get; set; }
+
     }
 }

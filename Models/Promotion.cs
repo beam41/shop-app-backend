@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ShopAppBackend.Models
 {
-    public class Product
+    public class Promotion
     {
         public int Id { get; set; }
 
@@ -14,57 +14,43 @@ namespace ShopAppBackend.Models
         public string Name { get; set; }
 
         [Required]
-        public int Price { get; set; }
-
-        [Required]
         public string Description { get; set; }
 
         [Required]
-        public bool IsVisible { get; set; }
-
-        [Required]
-        public ProductType Type { get; set; }
-
-        public ICollection<ProductImage> ProductImages { get; set; }
+        public bool IsBroadcasted { get; set; }
 
         public ICollection<PromotionItem> PromotionItems { get; set; }
     }
 
-    public class ProductFormDTO
+    public class AddPromotionDTO
     {
-        public int Id { get; set; }
-
         public string Name { get; set; }
-
-        public int Price { get; set; }
 
         public string Description { get; set; }
 
-        public bool IsVisible { get; set; }
+        public bool IsBroadcasted { get; set; }
 
-        public int TypeId { get; set; }
+        public ICollection<PromotionItemsDTO> PromotionItems { get; set; }
 
-        public static implicit operator Product(ProductFormDTO p)
+        public static implicit operator Promotion(AddPromotionDTO p)
         {
-            return new Product
+            return new Promotion
             {
-                Id = p.Id,
                 Name = p.Name,
-                Price = p.Price,
                 Description = p.Description,
-                IsVisible = p.IsVisible
+                IsBroadcasted = p.IsBroadcasted
             };
         }
     }
 
-    public class ProductDisplayDTO
+    public class PromotionDisplayDTO
     {
         public int Id { get; set; }
 
         public string Name { get; set; }
 
-        public int Price { get; set; }
+        public string Description { get; set; }
 
-        public int? NewPrice { get; set; }
+        public ICollection<ProductDisplayDTO> ProductList { get; set; }
     }
 }

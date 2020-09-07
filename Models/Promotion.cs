@@ -66,7 +66,7 @@ namespace ShopAppBackend.Models
         {
             if (p != null)
             {
-                return new Promotion
+                return new PromotionInProductDetailDTO
                 {
                     Id = p.Id,
                     Name = p.Name,

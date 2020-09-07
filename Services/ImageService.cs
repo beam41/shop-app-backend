@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Microsoft.AspNetCore.Http;
 using ShopAppBackend.Settings;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
@@ -21,9 +23,31 @@ namespace ShopAppBackend.Services
             _settings = settings;
         }
 
-        public async Task<bool> ConvertImg(Stream input, Stream output)
+        public async Task<string> Uploader(IFormFile image)
+        {
+            var fileName = Guid.NewGuid().ToString() + ".jpg";
+
+            BlobClient blobClient = new BlobClient(_settings.ConnectionString, _settings.ContainerName, fileName);
+
+            using MemoryStream imageStream = new MemoryStream();
+            await image.CopyToAsync(imageStream);
+
+            using MemoryStream output = new MemoryStream();
+            await ConvertImg(imageStream, output);
+
+            await blobClient.UploadAsync(output, new BlobUploadOptions
+                {
+                    HttpHeaders = new BlobHttpHeaders { ContentType = "image/jpeg" }
+                }
+            );
+
+            return fileName;
+        }
+
+        public async Task ConvertImg(Stream input, Stream output)
         {
             input.Position = 0;
+
             using Image<Rgba32> image = await Image.LoadAsync<Rgba32>(input);
             image.Metadata.ExifProfile = null;
 
@@ -44,7 +68,7 @@ namespace ShopAppBackend.Services
 
             await image.SaveAsJpegAsync(output);
             output.Position = 0;
-            return true;
+            return;
         }
     }
 

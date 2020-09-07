@@ -12,6 +12,8 @@ namespace ShopAppBackend.Settings
         public string ConnectionString { get; set; }
 
         public string ContainerName { get; set; }
+
+        public string BlobPath { get; set; }
     }
 
     public interface IImageSettings
@@ -21,5 +23,7 @@ namespace ShopAppBackend.Settings
         public string ConnectionString { get; set; }
 
         public string ContainerName { get; set; }
+
+        public string BlobPath { get; set; }
     }
 }

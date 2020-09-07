@@ -81,8 +81,7 @@ namespace ShopAppBackend.Controllers
         private Task<bool> ProductPromotionIsActive(IEnumerable<int> productId)
         {
             return _context.PromotionItem
-                .Where(pi => pi.Promotion.IsBroadcasted)
-                .AnyAsync(pi => productId.Contains(pi.InPromotionProduct.Id));
+                .AnyAsync(pi => pi.Promotion.IsBroadcasted && productId.Contains(pi.InPromotionProduct.Id));
         }
 
         private Task<bool> PromotionExists(int id)

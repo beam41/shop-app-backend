@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -14,6 +15,13 @@ namespace ShopAppBackend.Models
         public Product Product { get; set; }
 
         [Required]
+        public string ImageFileName { get; set; }
+    }
+
+    public class ProductImageUrlDTO
+    {
+        public int Id { get; set; }
+
         public string ImageUrl { get; set; }
     }
 }

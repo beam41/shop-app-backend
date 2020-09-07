@@ -18,10 +18,13 @@
     <Compile Remove="Migrations\20200905160426_Product.Designer.cs" />
     <Compile Remove="Migrations\20200906063902_Promotion.cs" />
     <Compile Remove="Migrations\20200906063902_Promotion.Designer.cs" />
+    <Compile Remove="Migrations\20200907133957_Rename-Product-image.cs" />
+    <Compile Remove="Migrations\20200907133957_Rename-Product-image.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Azure.Storage.Blobs" Version="12.6.0" />
+    <PackageReference Include="Flurl" Version="2.8.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.7" />
     <PackageReference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation" Version="3.1.7" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.7" />
@@ -33,10 +36,6 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Migrations\" />
   </ItemGroup>
 
 

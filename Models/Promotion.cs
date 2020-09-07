@@ -53,4 +53,23 @@ namespace ShopAppBackend.Models
 
         public ICollection<ProductDisplayDTO> ProductList { get; set; }
     }
+
+    public class PromotionInProductDetailDTO
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public string Description { get; set; }
+
+        public static implicit operator PromotionInProductDetailDTO(Promotion p)
+        {
+            return new Promotion
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Description = p.Description,
+            };
+        }
+    }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -44,6 +45,8 @@ namespace ShopAppBackend.Models
 
         public int TypeId { get; set; }
 
+        public ICollection<IFormFile> Images { get; set; }
+
         public static implicit operator Product(ProductFormDTO p)
         {
             return new Product
@@ -66,5 +69,24 @@ namespace ShopAppBackend.Models
         public int Price { get; set; }
 
         public int? NewPrice { get; set; }
+
+        public string ProductImageUrl { get; set; }
+    }
+
+    public class ProductDetailDTO
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public int Price { get; set; }
+
+        public int? NewPrice { get; set; }
+
+        public ICollection<ProductImageUrlDTO> ProductImagesUrl { get; set; }
+
+        public string Description { get; set; }
+
+        public PromotionInProductDetailDTO Promotion { get; set; }
     }
 }

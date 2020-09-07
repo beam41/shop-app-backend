@@ -69,7 +69,7 @@ namespace ShopAppBackend.Controllers
                     promotionItems.Add(promotionItem);
                 }
                 _context.AttachRange(products);
-                await _context.PromotionItem.AddRange(promotionItems);
+                _context.PromotionItem.AddRange(promotionItems);
                 await _context.SaveChangesAsync();
 
                 return CreatedAtAction("GetPromotion", new { id = newPromotion.Id }, newPromotion);

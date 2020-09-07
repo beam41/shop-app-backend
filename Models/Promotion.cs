@@ -64,12 +64,16 @@ namespace ShopAppBackend.Models
 
         public static implicit operator PromotionInProductDetailDTO(Promotion p)
         {
-            return new Promotion
+            if (p != null)
             {
-                Id = p.Id,
-                Name = p.Name,
-                Description = p.Description,
-            };
+                return new Promotion
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Description = p.Description,
+                };
+            }
+            return null;
         }
     }
 }

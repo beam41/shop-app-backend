@@ -63,7 +63,7 @@ namespace ShopAppBackend.Controllers
                 iterationCount: 10000,
                 numBytesRequested: 32));
 
-            _context.User.Add(user);
+            await _context.User.AddAsync(user);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetUser", new { id = user.Id }, user);
@@ -71,7 +71,7 @@ namespace ShopAppBackend.Controllers
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public ActionResult<User> Login(User userBody)
+        public async Task<ActionResult<User>> Login(User userBody)
         {
             var passwordHash = Convert.ToBase64String(KeyDerivation.Pbkdf2(
                 password: userBody.Password,
@@ -80,10 +80,11 @@ namespace ShopAppBackend.Controllers
                 iterationCount: 10000,
                 numBytesRequested: 32));
 
-            User user = _context.User.Where(u =>
-                u.Username == userBody.Username &&
-                u.Password == passwordHash
-            ).FirstOrDefault();
+            User user = await _context.User
+                .FirstOrDefaultAsync(u =>
+                    u.Username == userBody.Username &&
+                    u.Password == passwordHash
+                );
 
             // return null if user not found
             if (user == null)

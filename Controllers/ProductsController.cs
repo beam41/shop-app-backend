@@ -54,7 +54,7 @@ namespace ShopAppBackend.Controllers
         [HttpGet("type/{type}")]
         public async Task<ActionResult<IEnumerable<ProductDisplayDTO>>> GetByType(string type)
         {
-            if (!ProductTypeExists(type))
+            if (!await ProductTypeExists(type))
             {
                 return NotFound();
             }
@@ -143,20 +143,20 @@ namespace ShopAppBackend.Controllers
             _context.Attach(type);
             Product newProduct = product;
             newProduct.Type = type;
-            _context.Product.Add(newProduct);
+            await _context.Product.AddAsync(newProduct);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetProduct", new { id = newProduct.Id }, newProduct);
         }
 
-        private bool ProductExists(int id)
+        private Task<bool> ProductExists(int id)
         {
-            return _context.Product.Any(e => e.Id == id);
+            return _context.Product.AnyAsync(e => e.Id == id);
         }
 
-        private bool ProductTypeExists(string name)
+        private Task<bool> ProductTypeExists(string name)
         {
-            return _context.ProductType.Any(e => e.Name == name);
+            return _context.ProductType.AnyAsync(e => e.Name == name);
         }
     }
 }

@@ -61,7 +61,7 @@ namespace ShopAppBackend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ProductTypeExists(id))
+                if (!await ProductTypeExists(id))
                 {
                     return NotFound();
                 }
@@ -80,7 +80,7 @@ namespace ShopAppBackend.Controllers
         [HttpPost]
         public async Task<ActionResult<ProductType>> PostProductType(ProductType productType)
         {
-            _context.ProductType.Add(productType);
+            await _context.ProductType.AddAsync(productType);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetProductType", new { id = productType.Id }, productType);
@@ -102,9 +102,9 @@ namespace ShopAppBackend.Controllers
             return productType;
         }
 
-        private bool ProductTypeExists(int id)
+        private Task<bool> ProductTypeExists(int id)
         {
-            return _context.ProductType.Any(e => e.Id == id);
+            return _context.ProductType.AnyAsync(e => e.Id == id);
         }
     }
 }

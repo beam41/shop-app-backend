@@ -50,7 +50,7 @@ namespace ShopAppBackend.Controllers
         {
             var productIdList = promotion.PromotionItems.Select(p => p.ProductId);
 
-            if (!ProductPromotionIsActive(productIdList))
+            if (!await ProductPromotionIsActive(productIdList))
             {
                 Promotion newPromotion = promotion;
                 _context.Promotion.Add(newPromotion);
@@ -69,7 +69,7 @@ namespace ShopAppBackend.Controllers
                     promotionItems.Add(promotionItem);
                 }
                 _context.AttachRange(products);
-                _context.PromotionItem.AddRange(promotionItems);
+                await _context.PromotionItem.AddRangeAsync(promotionItems);
                 await _context.SaveChangesAsync();
 
                 return CreatedAtAction("GetPromotion", new { id = newPromotion.Id }, newPromotion);
@@ -78,16 +78,16 @@ namespace ShopAppBackend.Controllers
             return BadRequest();
         }
 
-        private bool ProductPromotionIsActive(IEnumerable<int> productId)
+        private Task<bool> ProductPromotionIsActive(IEnumerable<int> productId)
         {
             return _context.PromotionItem
                 .Where(pi => pi.Promotion.IsBroadcasted)
-                .Any(pi => productId.Contains(pi.InPromotionProduct.Id));
+                .AnyAsync(pi => productId.Contains(pi.InPromotionProduct.Id));
         }
 
-        private bool PromotionExists(int id)
+        private Task<bool> PromotionExists(int id)
         {
-            return _context.Promotion.Any(e => e.Id == id);
+            return _context.Promotion.AnyAsync(e => e.Id == id);
         }
     }
 }

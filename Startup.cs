@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using ShopAppBackend.Models.Context;
+using ShopAppBackend.Services;
 using ShopAppBackend.Settings;
 
 namespace ShopAppBackend
@@ -32,6 +33,12 @@ namespace ShopAppBackend
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(Configuration["ConnectionString"]));
+
+            services.Configure<ImageSettings>(
+                Configuration.GetSection(nameof(ImageSettings)));
+
+            services.AddSingleton<IImageSettings>(sp =>
+                sp.GetRequiredService<IOptions<ImageSettings>>().Value);
 
             var userSettingsSection = Configuration.GetSection(nameof(UserSettings));
             services.Configure<UserSettings>(userSettingsSection);
@@ -65,6 +72,8 @@ namespace ShopAppBackend
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
                 // options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore; 
             });
+
+            services.AddSingleton<ImageService>();
 
             services.AddControllers();
         }

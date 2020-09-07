@@ -63,7 +63,7 @@ namespace ShopAppBackend.Controllers
                 iterationCount: 10000,
                 numBytesRequested: 32));
 
-            await _context.User.AddAsync(user);
+            _context.User.Add(user);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetUser", new { id = user.Id }, user);

@@ -143,7 +143,7 @@ namespace ShopAppBackend.Controllers
             _context.Attach(type);
             Product newProduct = product;
             newProduct.Type = type;
-            await _context.Product.AddAsync(newProduct);
+            _context.Product.Add(newProduct);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetProduct", new { id = newProduct.Id }, newProduct);

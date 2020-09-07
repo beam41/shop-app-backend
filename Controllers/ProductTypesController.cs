@@ -80,7 +80,7 @@ namespace ShopAppBackend.Controllers
         [HttpPost]
         public async Task<ActionResult<ProductType>> PostProductType(ProductType productType)
         {
-            await _context.ProductType.AddAsync(productType);
+            _context.ProductType.Add(productType);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetProductType", new { id = productType.Id }, productType);

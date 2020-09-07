@@ -70,7 +70,7 @@ namespace ShopAppBackend.Models
 
         public int? NewPrice { get; set; }
 
-        public string ImgUrl { get; set; }
+        public string ImageUrl { get; set; }
     }
 
     public class ProductDetailDTO
@@ -83,7 +83,7 @@ namespace ShopAppBackend.Models
 
         public int? NewPrice { get; set; }
 
-        public ICollection<ProductImageUrlDTO> ImgUrls { get; set; }
+        public ICollection<ProductImageUrlDTO> ImageUrls { get; set; }
 
         public string Description { get; set; }
 

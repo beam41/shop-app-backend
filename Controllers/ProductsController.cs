@@ -56,7 +56,7 @@ namespace ShopAppBackend.Controllers
                     Name = p.Name,
                     Price = p.Price,
                     NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted).NewPrice,
-                    ProductImageUrl = p.ProductImages
+                    ImgUrl = p.ProductImages
                         .Select(pi => new ProductImageUrlDTO
                         {
                             Id = pi.Id,
@@ -86,7 +86,7 @@ namespace ShopAppBackend.Controllers
                     Name = p.Name,
                     Price = p.Price,
                     NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted).NewPrice,
-                    ProductImageUrl = p.ProductImages
+                    ImgUrl = p.ProductImages
                         .Select(pi => new ProductImageUrlDTO
                         {
                             Id = pi.Id,
@@ -121,7 +121,7 @@ namespace ShopAppBackend.Controllers
                             Name = p.Name,
                             Price = p.Price,
                             NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted).NewPrice,
-                            ProductImageUrl = p.ProductImages
+                            ImgUrl = p.ProductImages
                                 .Select(pi => new ProductImageUrlDTO
                                 {
                                     Id = pi.Id,
@@ -153,7 +153,7 @@ namespace ShopAppBackend.Controllers
                             Name = pro.InPromotionProduct.Name,
                             Price = pro.InPromotionProduct.Price,
                             NewPrice = pro.NewPrice,
-                            ProductImageUrl = pro.InPromotionProduct.ProductImages
+                            ImgUrl = pro.InPromotionProduct.ProductImages
                                 .Select(pi => new ProductImageUrlDTO
                                 {
                                     Id = pi.Id,
@@ -177,7 +177,7 @@ namespace ShopAppBackend.Controllers
                     Name = p.Name,
                     Price = p.Price,
                     NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted).NewPrice,
-                    ProductImagesUrl = (ICollection<ProductImageUrlDTO>) p.ProductImages
+                    ImgUrls = (ICollection<ProductImageUrlDTO>) p.ProductImages
                         .Select(pi => new ProductImageUrlDTO
                         {
                             Id = pi.Id,

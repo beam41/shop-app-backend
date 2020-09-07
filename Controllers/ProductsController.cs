@@ -48,6 +48,12 @@ namespace ShopAppBackend.Controllers
         [HttpGet("recommend")]
         public async Task<ActionResult<IEnumerable<ProductDisplayDTO>>> GetRecommend()
         {
+            int amount = 0;
+            if (!int.TryParse(Request.Query["amount"], out amount))
+            {
+                return BadRequest();
+            }
+
             return await _context.Product
                 .Where(p => p.IsVisible)
                 .Select(p => new ProductDisplayDTO
@@ -66,7 +72,7 @@ namespace ShopAppBackend.Controllers
                         .ImageUrl,
                 })
                 .OrderBy(p => Guid.NewGuid())
-                .Take(int.Parse(Request.Query["amount"]))
+                .Take(amount)
                 .ToListAsync();
         }
 
@@ -96,17 +102,17 @@ namespace ShopAppBackend.Controllers
                         .ImageUrl,
                 });
 
-            if (Request.Query["amount"] == StringValues.Empty)
-            {
-                return await query.ToListAsync();
-            }
-
-            return await query.Take(int.Parse(Request.Query["amount"])).ToListAsync();
+            return await query.ToListAsync();
         }
 
         [HttpGet("type")]
         public async Task<ActionResult<IEnumerable<ProductTypeDisplayDTO>>> GetAllTypeAndProduct()
         {
+            if (!int.TryParse(Request.Query["amount"], out int amount))
+            {
+                return BadRequest();
+            }
+
             return await _context.ProductType
                 .Where(pt => pt.Products.Count() > 0)
                 .Select(pt => new ProductTypeDisplayDTO
@@ -130,7 +136,7 @@ namespace ShopAppBackend.Controllers
                                 .FirstOrDefault()
                                 .ImageUrl,
                         })
-                        .Take(int.Parse(Request.Query["amount"]))
+                        .Take(amount)
                 })
                 .ToListAsync();
         }

@@ -64,18 +64,22 @@ namespace ShopAppBackend.Models
 
         public static implicit operator UserLoginDTO(User u)
         {
-            return new UserLoginDTO()
+            if (u != null)
             {
-                Id = u.Id,
-                Username = u.Username,
-                PhoneNumber = u.PhoneNumber,
-                FullName = u.FullName,
-                Address = u.Address,
-                Province = u.Province,
-                District = u.District,
-                SubDistrict = u.SubDistrict,
-                PostalCode = u.PostalCode
-            };
+                return new UserLoginDTO()
+                {
+                    Id = u.Id,
+                    Username = u.Username,
+                    PhoneNumber = u.PhoneNumber,
+                    FullName = u.FullName,
+                    Address = u.Address,
+                    Province = u.Province,
+                    District = u.District,
+                    SubDistrict = u.SubDistrict,
+                    PostalCode = u.PostalCode
+                };
+            }
+            return null;
         }
     }
 

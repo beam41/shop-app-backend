@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Azure.Storage.Blobs;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Primitives;
 using ShopAppBackend.Models;
 using ShopAppBackend.Models.Context;
 using ShopAppBackend.Services;
 using ShopAppBackend.Settings;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ShopAppBackend.Controllers
 {
@@ -24,14 +19,10 @@ namespace ShopAppBackend.Controllers
 
         private readonly ImageService _imageService;
 
-        private readonly IImageSettings _imageSettings;
-
-
-        public ProductsController(DatabaseContext context, ImageService imageService, IImageSettings imageSettings)
+        public ProductsController(DatabaseContext context, ImageService imageService)
         {
             _context = context;
             _imageService = imageService;
-            _imageSettings = imageSettings;
         }
 
         [HttpGet]
@@ -66,7 +57,7 @@ namespace ShopAppBackend.Controllers
                         .Select(pi => new ProductImageUrlDTO
                         {
                             Id = pi.Id,
-                            ImageUrl = Flurl.Url.Combine(_imageSettings.BlobPath, _imageSettings.ContainerName, pi.ImageFileName)
+                            ImageUrl = _imageService.GetImageUrl(pi.ImageFileName)
                         })
                         .FirstOrDefault()
                         .ImageUrl,
@@ -96,7 +87,7 @@ namespace ShopAppBackend.Controllers
                         .Select(pi => new ProductImageUrlDTO
                         {
                             Id = pi.Id,
-                            ImageUrl = Flurl.Url.Combine(_imageSettings.BlobPath, _imageSettings.ContainerName, pi.ImageFileName)
+                            ImageUrl = _imageService.GetImageUrl(pi.ImageFileName)
                         })
                         .FirstOrDefault()
                         .ImageUrl,
@@ -119,7 +110,7 @@ namespace ShopAppBackend.Controllers
                 {
                     Id = pt.Id,
                     Name = pt.Name,
-                    ProductList = (ICollection<ProductDisplayDTO>) pt.Products
+                    ProductList = (ICollection<ProductDisplayDTO>)pt.Products
                         .Where(p => p.IsVisible)
                         .Select(p => new ProductDisplayDTO
                         {
@@ -131,7 +122,7 @@ namespace ShopAppBackend.Controllers
                                 .Select(pi => new ProductImageUrlDTO
                                 {
                                     Id = pi.Id,
-                                    ImageUrl = Flurl.Url.Combine(_imageSettings.BlobPath, _imageSettings.ContainerName, pi.ImageFileName)
+                                    ImageUrl = _imageService.GetImageUrl(pi.ImageFileName)
                                 })
                                 .FirstOrDefault()
                                 .ImageUrl,
@@ -151,7 +142,7 @@ namespace ShopAppBackend.Controllers
                     Id = p.Id,
                     Name = p.Name,
                     Description = p.Description,
-                    ProductList = (ICollection<ProductDisplayDTO>) p.PromotionItems
+                    ProductList = (ICollection<ProductDisplayDTO>)p.PromotionItems
                         .Where(pi => pi.InPromotionProduct.IsVisible)
                         .Select(pro => new ProductDisplayDTO
                         {
@@ -163,7 +154,7 @@ namespace ShopAppBackend.Controllers
                                 .Select(pi => new ProductImageUrlDTO
                                 {
                                     Id = pi.Id,
-                                    ImageUrl = Flurl.Url.Combine(_imageSettings.BlobPath, _imageSettings.ContainerName, pi.ImageFileName)
+                                    ImageUrl = _imageService.GetImageUrl(pi.ImageFileName)
                                 })
                                 .FirstOrDefault()
                                 .ImageUrl,
@@ -183,11 +174,11 @@ namespace ShopAppBackend.Controllers
                     Name = p.Name,
                     Price = p.Price,
                     NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted).NewPrice,
-                    ImageUrls = (ICollection<ProductImageUrlDTO>) p.ProductImages
+                    ImageUrls = (ICollection<ProductImageUrlDTO>)p.ProductImages
                         .Select(pi => new ProductImageUrlDTO
                         {
                             Id = pi.Id,
-                            ImageUrl = Flurl.Url.Combine(_imageSettings.BlobPath, _imageSettings.ContainerName, pi.ImageFileName)
+                            ImageUrl = _imageService.GetImageUrl(pi.ImageFileName)
                         }),
                     Description = p.Description,
                     Promotion = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted).Promotion
@@ -223,7 +214,8 @@ namespace ShopAppBackend.Controllers
             newProduct.Type = type;
 
             newProduct.ProductImages = new List<ProductImage>();
-            var fileNameList = product.Images.Select(async p => {
+            var fileNameList = product.Images.Select(async p =>
+            {
                 var fileName = await _imageService.Uploader(p);
                 ProductImage pi = new ProductImage { ImageFileName = fileName };
                 newProduct.ProductImages.Add(pi);

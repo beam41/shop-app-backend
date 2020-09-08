@@ -3,31 +3,34 @@ using Azure.Storage.Blobs.Models;
 using Microsoft.AspNetCore.Http;
 using ShopAppBackend.Settings;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
+using Flurl;
 
 namespace ShopAppBackend.Services
 {
     public class ImageService
     {
-        private readonly IImageSettings _settings;
+        private readonly IImageSettings _imageSettings;
 
-        public ImageService(IImageSettings settings)
+        public ImageService(IImageSettings imageSettings)
         {
-            _settings = settings;
+            _imageSettings = imageSettings;
+        }
+
+        public string GetImageUrl(string fileName)
+        {
+            return Url.Combine(_imageSettings.BlobPath, _imageSettings.ContainerName, fileName);
         }
 
         public async Task<string> Uploader(IFormFile image)
         {
             var fileName = Guid.NewGuid().ToString() + ".jpg";
 
-            BlobClient blobClient = new BlobClient(_settings.ConnectionString, _settings.ContainerName, fileName);
+            BlobClient blobClient = new BlobClient(_imageSettings.ConnectionString, _imageSettings.ContainerName, fileName);
 
             using MemoryStream imageStream = new MemoryStream();
             await image.CopyToAsync(imageStream);
@@ -36,10 +39,9 @@ namespace ShopAppBackend.Services
             await ConvertImg(imageStream, output);
 
             await blobClient.UploadAsync(output, new BlobUploadOptions
-                {
-                    HttpHeaders = new BlobHttpHeaders { ContentType = "image/jpeg" }
-                }
-            );
+            {
+                HttpHeaders = new BlobHttpHeaders { ContentType = "image/jpeg" }
+            });
 
             return fileName;
         }
@@ -53,16 +55,16 @@ namespace ShopAppBackend.Services
 
             double ratio = Convert.ToDouble(image.Width) / image.Height;
 
-            if (image.Width >= image.Height && image.Width > _settings.MaxWidth)
+            if (image.Width >= image.Height && image.Width > _imageSettings.MaxWidth)
             {
                 image.Mutate(x => x
-                    .Resize(_settings.MaxWidth, (int)Math.Round(_settings.MaxWidth / ratio))
+                    .Resize(_imageSettings.MaxWidth, (int)Math.Round(_imageSettings.MaxWidth / ratio))
                 );
             }
-            else if (image.Width < image.Height && image.Height > _settings.MaxWidth)
+            else if (image.Width < image.Height && image.Height > _imageSettings.MaxWidth)
             {
                 image.Mutate(x => x
-                    .Resize((int)Math.Round(_settings.MaxWidth * ratio), _settings.MaxWidth)
+                    .Resize((int)Math.Round(_imageSettings.MaxWidth * ratio), _imageSettings.MaxWidth)
                 );
             }
 

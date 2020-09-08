@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace ShopAppBackend.Settings
+﻿namespace ShopAppBackend.Settings
 {
     public class UserSettings : IUserSettings
     {

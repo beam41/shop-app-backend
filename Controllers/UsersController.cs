@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ShopAppBackend.Models;
 using ShopAppBackend.Models.Context;
+using ShopAppBackend.Services;
 using ShopAppBackend.Settings;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace ShopAppBackend.Controllers
 {
@@ -22,12 +22,13 @@ namespace ShopAppBackend.Controllers
     public class UsersController : ControllerBase
     {
         private readonly DatabaseContext _context;
-        private readonly IUserSettings _userSettings;
 
-        public UsersController(DatabaseContext context, IUserSettings userSettings)
+        private readonly AuthService _authService;
+
+        public UsersController(DatabaseContext context, AuthService authService)
         {
             _context = context;
-            _userSettings = userSettings;
+            _authService = authService;
         }
 
         // GET: api/Users
@@ -53,34 +54,45 @@ namespace ShopAppBackend.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("register")]
-        public async Task<ActionResult<User>> Register(User user)
+        [HttpGet("check-exist")]
+        public async Task<ActionResult<UserLoginDTO>> CheckUserExist()
         {
-            user.Password = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: user.Password,
-                salt: Encoding.ASCII.GetBytes(_userSettings.PasswordSalt),
-                prf: KeyDerivationPrf.HMACSHA1,
-                iterationCount: 10000,
-                numBytesRequested: 32));
+            if (await UserExist(Request.Query["username"]))
+            {
+                return Ok(new { result = true });
+            }
+
+            return Ok(new { result = false });
+        }
+
+        [AllowAnonymous]
+        [HttpPost("register")]
+        public async Task<ActionResult<UserLoginDTO>> Register(User user)
+        {
+            if (user.Username.Length < 6)
+            {
+                return Forbid();
+            }
+
+            user.Password = _authService.HashPassword(user.Password);
 
             _context.User.Add(user);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
+            UserLoginDTO newUser = user;
+
+            _authService.GenToken(newUser);
+
+            return CreatedAtAction("Login", newUser);
         }
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<ActionResult<User>> Login(User userBody)
+        public async Task<ActionResult<UserLoginDTO>> Login(User userBody)
         {
-            var passwordHash = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: userBody.Password,
-                salt: Encoding.ASCII.GetBytes(_userSettings.PasswordSalt),
-                prf: KeyDerivationPrf.HMACSHA1,
-                iterationCount: 10000,
-                numBytesRequested: 32));
+            var passwordHash = _authService.HashPassword(userBody.Password);
 
-            User user = await _context.User
+            UserLoginDTO user = await _context.User
                 .FirstOrDefaultAsync(u =>
                     u.Username == userBody.Username &&
                     u.Password == passwordHash
@@ -92,19 +104,14 @@ namespace ShopAppBackend.Controllers
                 return BadRequest(new { message = "Username or password is incorrect" });
             }
 
-            // authentication successful so generate jwt token
-            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-            byte[] key = Encoding.ASCII.GetBytes(_userSettings.Secret);
-            SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new System.Security.Claims.ClaimsIdentity(),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
-            user.Token = tokenHandler.WriteToken(token);
+            _authService.GenToken(user);
 
             return Ok(user);
+        }
+
+        private Task<bool> UserExist(string username)
+        {
+            return _context.User.AnyAsync(u => u.Username == username);
         }
     }
 }

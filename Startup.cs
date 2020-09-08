@@ -1,33 +1,29 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using ShopAppBackend.Models.Context;
 using ShopAppBackend.Services;
 using ShopAppBackend.Settings;
+using System.Text;
 
 namespace ShopAppBackend
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
+            _currentEnvironment = env;
         }
 
         public IConfiguration Configuration { get; }
+        private readonly IWebHostEnvironment _currentEnvironment;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -56,7 +52,7 @@ namespace ShopAppBackend
             })
             .AddJwtBearer(x =>
             {
-                x.RequireHttpsMetadata = false;
+                x.RequireHttpsMetadata = !_currentEnvironment.IsDevelopment();
                 x.SaveToken = true;
                 x.TokenValidationParameters = new TokenValidationParameters
                 {
@@ -74,6 +70,7 @@ namespace ShopAppBackend
             });
 
             services.AddSingleton<ImageService>();
+            services.AddSingleton<AuthService>();
 
             services.AddControllers();
         }
@@ -85,7 +82,7 @@ namespace ShopAppBackend
             {
                 app.UseDeveloperExceptionPage();
             }
-            
+
             app.UseRouting();
 
             app.UseAuthentication();

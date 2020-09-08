@@ -69,7 +69,7 @@ namespace ShopAppBackend.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<UserLoginDTO>> Register(User user)
         {
-            if (user.Username.Length < 6)
+            if (user.Username.Length < 6 || user.Password.Length < 6)
             {
                 return Forbid();
             }

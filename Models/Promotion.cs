@@ -19,7 +19,7 @@ namespace ShopAppBackend.Models
         public ICollection<PromotionItem> PromotionItems { get; set; }
     }
 
-    public class AddPromotionDTO
+    public class PromotionFormDTO
     {
         public string Name { get; set; }
 
@@ -29,7 +29,7 @@ namespace ShopAppBackend.Models
 
         public ICollection<PromotionItemsDTO> PromotionItems { get; set; }
 
-        public static implicit operator Promotion(AddPromotionDTO p)
+        public static implicit operator Promotion(PromotionFormDTO p)
         {
             return new Promotion
             {

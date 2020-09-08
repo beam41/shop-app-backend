@@ -88,7 +88,7 @@ namespace ShopAppBackend.Controllers
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<ActionResult<UserLoginDTO>> Login(User userBody)
+        public async Task<ActionResult<UserLoginDTO>> Login(UserLoginFormDTO userBody)
         {
             var passwordHash = _authService.HashPassword(userBody.Password);
 

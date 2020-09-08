@@ -45,7 +45,7 @@ namespace ShopAppBackend.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<Promotion>> PostPromotion(AddPromotionDTO promotion)
+        public async Task<ActionResult<Promotion>> PostPromotion(PromotionFormDTO promotion)
         {
             var productIdList = promotion.PromotionItems.Select(p => p.ProductId);
 

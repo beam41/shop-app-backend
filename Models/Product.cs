@@ -32,16 +32,22 @@ namespace ShopAppBackend.Models
     {
         public int Id { get; set; }
 
+        [Required]
         public string Name { get; set; }
 
+        [Required]
         public int Price { get; set; }
 
+        [Required]
         public string Description { get; set; }
 
+        [Required]
         public bool IsVisible { get; set; }
 
+        [Required]
         public int TypeId { get; set; }
 
+        [Required]
         public ICollection<IFormFile> Images { get; set; }
 
         public static implicit operator Product(ProductFormDTO p)

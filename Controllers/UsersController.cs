@@ -59,21 +59,16 @@ namespace ShopAppBackend.Controllers
         {
             if (await UserExist(Request.Query["username"]))
             {
-                return Ok(new { result = true });
+                return Ok(new {result = true});
             }
 
-            return Ok(new { result = false });
+            return Ok(new {result = false});
         }
 
         [AllowAnonymous]
         [HttpPost("register")]
         public async Task<ActionResult<UserLoginDTO>> Register(User user)
         {
-            if (user.Username.Length < 6 || user.Password.Length < 6)
-            {
-                return Forbid();
-            }
-
             user.Password = _authService.HashPassword(user.Password);
 
             _context.User.Add(user);
@@ -101,7 +96,7 @@ namespace ShopAppBackend.Controllers
             // return null if user not found
             if (user == null)
             {
-                return BadRequest(new { message = "Username or password is incorrect" });
+                return Forbid();
             }
 
             _authService.GenToken(user);

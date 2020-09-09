@@ -39,11 +39,7 @@ namespace ShopAppBackend.Controllers
         [HttpGet("recommend")]
         public async Task<ActionResult<IEnumerable<ProductDisplayDTO>>> GetRecommend()
         {
-            int amount = 0;
-            if (!int.TryParse(Request.Query["amount"], out amount))
-            {
-                return BadRequest();
-            }
+            if (!int.TryParse(Request.Query["amount"], out var amount)) return BadRequest();
 
             return await _context.Product
                 .Where(p => p.IsVisible)
@@ -60,7 +56,7 @@ namespace ShopAppBackend.Controllers
                             ImageUrl = _imageService.GetImageUrl(pi.ImageFileName)
                         })
                         .FirstOrDefault()
-                        .ImageUrl,
+                        .ImageUrl
                 })
                 .OrderBy(p => Guid.NewGuid())
                 .Take(amount)
@@ -70,10 +66,7 @@ namespace ShopAppBackend.Controllers
         [HttpGet("type/{type}")]
         public async Task<ActionResult<IEnumerable<ProductDisplayDTO>>> GetByType(string type)
         {
-            if (!await ProductTypeExists(type))
-            {
-                return NotFound();
-            }
+            if (!await ProductTypeExists(type)) return NotFound();
 
             var query = _context.Product
                 .Where(p => p.IsVisible && p.Type.Name == type)
@@ -90,7 +83,7 @@ namespace ShopAppBackend.Controllers
                             ImageUrl = _imageService.GetImageUrl(pi.ImageFileName)
                         })
                         .FirstOrDefault()
-                        .ImageUrl,
+                        .ImageUrl
                 });
 
             return await query.ToListAsync();
@@ -99,18 +92,15 @@ namespace ShopAppBackend.Controllers
         [HttpGet("type")]
         public async Task<ActionResult<IEnumerable<ProductTypeDisplayDTO>>> GetAllTypeAndProduct()
         {
-            if (!int.TryParse(Request.Query["amount"], out int amount))
-            {
-                return BadRequest();
-            }
+            if (!int.TryParse(Request.Query["amount"], out var amount)) return BadRequest();
 
             return await _context.ProductType
-                .Where(pt => pt.Products.Count() > 0)
+                .Where(pt => pt.Products.Any())
                 .Select(pt => new ProductTypeDisplayDTO
                 {
                     Id = pt.Id,
                     Name = pt.Name,
-                    ProductList = (ICollection<ProductDisplayDTO>)pt.Products
+                    ProductList = (ICollection<ProductDisplayDTO>) pt.Products
                         .Where(p => p.IsVisible)
                         .Select(p => new ProductDisplayDTO
                         {
@@ -125,7 +115,7 @@ namespace ShopAppBackend.Controllers
                                     ImageUrl = _imageService.GetImageUrl(pi.ImageFileName)
                                 })
                                 .FirstOrDefault()
-                                .ImageUrl,
+                                .ImageUrl
                         })
                         .Take(amount)
                 })
@@ -142,7 +132,7 @@ namespace ShopAppBackend.Controllers
                     Id = p.Id,
                     Name = p.Name,
                     Description = p.Description,
-                    ProductList = (ICollection<ProductDisplayDTO>)p.PromotionItems
+                    ProductList = (ICollection<ProductDisplayDTO>) p.PromotionItems
                         .Where(pi => pi.InPromotionProduct.IsVisible)
                         .Select(pro => new ProductDisplayDTO
                         {
@@ -157,7 +147,7 @@ namespace ShopAppBackend.Controllers
                                     ImageUrl = _imageService.GetImageUrl(pi.ImageFileName)
                                 })
                                 .FirstOrDefault()
-                                .ImageUrl,
+                                .ImageUrl
                         })
                 })
                 .ToListAsync();
@@ -174,7 +164,7 @@ namespace ShopAppBackend.Controllers
                     Name = p.Name,
                     Price = p.Price,
                     NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted).NewPrice,
-                    ImageUrls = (ICollection<ProductImageUrlDTO>)p.ProductImages
+                    ImageUrls = (ICollection<ProductImageUrlDTO>) p.ProductImages
                         .Select(pi => new ProductImageUrlDTO
                         {
                             Id = pi.Id,
@@ -182,12 +172,10 @@ namespace ShopAppBackend.Controllers
                         }),
                     Description = p.Description,
                     Promotion = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted).Promotion
-                }).FirstOrDefaultAsync(i => i.Id == id);
+                })
+                .FirstOrDefaultAsync(i => i.Id == id);
 
-            if (product == null)
-            {
-                return NotFound();
-            }
+            if (product == null) return NotFound();
 
             return product;
         }
@@ -217,7 +205,7 @@ namespace ShopAppBackend.Controllers
             var fileNameList = product.Images.Select(async p =>
             {
                 var fileName = await _imageService.Uploader(p);
-                ProductImage pi = new ProductImage { ImageFileName = fileName };
+                var pi = new ProductImage { ImageFileName = fileName };
                 newProduct.ProductImages.Add(pi);
             }).ToArray();
 

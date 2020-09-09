@@ -9,12 +9,12 @@ namespace ShopAppBackend.Models
 
         [Required]
         [Column(TypeName = "varchar(64)")]
-        [StringLength(64)]
+        [StringLength(64, MinimumLength = 6)]
         public string Username { get; set; }
 
         [Required]
         [Column(TypeName = "char(44)")]
-        [StringLength(44)]
+        [StringLength(44, MinimumLength = 6)]
         public string Password { get; set; }
 
         [Required]
@@ -86,9 +86,11 @@ namespace ShopAppBackend.Models
     public class UserLoginFormDTO
     {
         [Required]
+        [MinLength(6)]
         public string Username { get; set; }
 
         [Required]
+        [MinLength(6)]
         public string Password { get; set; }
     }
 }

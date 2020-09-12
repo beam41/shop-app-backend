@@ -11,6 +11,7 @@ using ShopAppBackend.Settings;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -104,9 +105,88 @@ namespace ShopAppBackend.Controllers
             return Ok(user);
         }
 
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> EditUser(int id, UserEditDTO userInfo)
+        { 
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            if (id != tokenId)
+            {
+                return BadRequest();
+            }
+
+            User user;
+            if (userInfo.NewPassword?.Length > 0)
+            {
+                var passwordHash = _authService.HashPassword(userInfo.Password);
+
+                user = await _context.User
+                    .FirstOrDefaultAsync(u =>
+                        u.Id == id &&
+                        u.Password == passwordHash
+                    );
+
+                if (user == null)
+                {
+                    return Forbid();
+                }
+
+                user.Password = _authService.HashPassword(userInfo.NewPassword);
+            }
+            else
+            {
+                user = await _context.User
+                    .FirstOrDefaultAsync(u =>
+                        u.Id == id
+                    );
+
+                if (user == null)
+                {
+                    return Forbid();
+                }
+            }
+
+            
+
+            user.PhoneNumber = userInfo.PhoneNumber;
+            user.FullName = userInfo.FullName;
+            user.Address = userInfo.Address;
+            user.Province = userInfo.Province;
+            user.District = userInfo.District;
+            user.SubDistrict = userInfo.SubDistrict;
+            user.PostalCode = userInfo.PostalCode;
+
+            await _context.SaveChangesAsync();
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!await UserExist(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+
+        }
+
         private Task<bool> UserExist(string username)
         {
             return _context.User.AnyAsync(u => u.Username == username);
+        }
+
+        private Task<bool> UserExist(int id)
+        {
+            return _context.User.AnyAsync(u => u.Id == id);
         }
     }
 }

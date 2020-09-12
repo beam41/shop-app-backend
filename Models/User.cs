@@ -93,4 +93,28 @@ namespace ShopAppBackend.Models
         [MinLength(6)]
         public string Password { get; set; }
     }
+
+    public class UserEditDTO
+    {
+        [StringLength(44, MinimumLength = 6)]
+        public string Password { get; set; }
+
+        [StringLength(44, MinimumLength = 6)]
+        public string NewPassword { get; set; }
+
+        public string PhoneNumber { get; set; }
+
+        public string FullName { get; set; }
+
+        public string Address { get; set; }
+
+        public string Province { get; set; }
+
+        public string District { get; set; }
+
+        public string SubDistrict { get; set; }
+
+        [StringLength(5)]
+        public string PostalCode { get; set; }
+    }
 }

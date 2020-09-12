@@ -26,13 +26,13 @@ namespace ShopAppBackend.Models
 
         public string Address { get; set; }
 
-        [Column(TypeName = "varchar(32)")]
+        [Column(TypeName = "nvarchar(32)")]
         public string Province { get; set; }
 
-        [Column(TypeName = "varchar(32)")]
+        [Column(TypeName = "nvarchar(32)")]
         public string District { get; set; }
 
-        [Column(TypeName = "varchar(32)")]
+        [Column(TypeName = "nvarchar(32)")]
         public string SubDistrict { get; set; }
 
         [Column(TypeName = "char(5)")]

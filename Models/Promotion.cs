@@ -17,6 +17,8 @@ namespace ShopAppBackend.Models
         public bool IsBroadcasted { get; set; }
 
         public ICollection<PromotionItem> PromotionItems { get; set; }
+
+        public ICollection<OrderPromotion> OrderPromotions { get; set; }
     }
 
     public class PromotionFormDTO

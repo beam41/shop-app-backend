@@ -20,6 +20,8 @@
     <Compile Remove="Migrations\20200906063902_Promotion.Designer.cs" />
     <Compile Remove="Migrations\20200907133957_Rename-Product-image.cs" />
     <Compile Remove="Migrations\20200907133957_Rename-Product-image.Designer.cs" />
+    <Compile Remove="Migrations\20200915165635_AddOrder.cs" />
+    <Compile Remove="Migrations\20200915165635_AddOrder.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

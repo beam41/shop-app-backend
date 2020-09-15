@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ShopAppBackend.Models
@@ -38,6 +39,8 @@ namespace ShopAppBackend.Models
         [Column(TypeName = "char(5)")]
         [StringLength(5)]
         public string PostalCode { get; set; }
+
+        public ICollection<Order> Orders { get; set; }
     }
 
     public class UserLoginDTO

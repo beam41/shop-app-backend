@@ -18,5 +18,7 @@ namespace ShopAppBackend.Models
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime CreatedAt { get; set; }
+
+        public string StateDataJson { get; set; }
     }
 }

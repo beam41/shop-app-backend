@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using ShopAppBackend.Enums;
 
 namespace ShopAppBackend.Models
@@ -18,6 +19,15 @@ namespace ShopAppBackend.Models
 
         public DateTime CreatedAt { get; set; }
 
-        public string StateDataJson { get; set; }
+        public JObject StateDataJson { get; set; }
+    }
+
+    public class OrderStateDTO
+    {
+        public OrderStateEnum State { get; set; }
+
+        public DateTime CreatedAt { get; set; }
+
+        public JObject StateDataJson { get; set; }
     }
 }

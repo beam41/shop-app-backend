@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using ShopAppBackend.Enums;
 
 namespace ShopAppBackend.Models
@@ -28,7 +29,7 @@ namespace ShopAppBackend.Models
     {
         public ICollection<OrderProductCreateDTO> Products { get; set; }
 
-        public string AddressJson { get; set; }
+        public JObject AddressJson { get; set; }
 
         public PurchaseMethodEnum PurchaseMethod { get; set; }
     }

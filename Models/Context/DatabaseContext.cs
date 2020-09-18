@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using ShopAppBackend.Models;
 
 namespace ShopAppBackend.Models.Context
@@ -19,6 +22,11 @@ namespace ShopAppBackend.Models.Context
             modelBuilder.Entity<OrderState>()
                 .Property(os => os.CreatedAt)
                 .HasDefaultValueSql("getdate()");
+
+            modelBuilder.Entity<OrderState>()
+                .Property(e => e.StateDataJson).HasConversion(
+                os => JsonConvert.SerializeObject(os),
+                os => JsonConvert.DeserializeObject<JObject>(os));
 
             // product(M) and its Type(1)
             modelBuilder.Entity<Product>()

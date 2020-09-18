@@ -26,8 +26,6 @@ namespace ShopAppBackend.Models
         public ICollection<ProductImage> ProductImages { get; set; }
 
         public ICollection<PromotionItem> PromotionItems { get; set; }
-
-        public ICollection<OrderProduct> OrderProducts { get; set; }
     }
 
     public class ProductFormDTO

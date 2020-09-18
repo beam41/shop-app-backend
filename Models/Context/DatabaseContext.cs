@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ShopAppBackend.Models;
 
 namespace ShopAppBackend.Models.Context
 {
@@ -12,7 +13,12 @@ namespace ShopAppBackend.Models.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>()
-                .HasAlternateKey(u => u.Username);
+                .HasIndex(u => u.Username)
+                .IsUnique();
+
+            modelBuilder.Entity<OrderState>()
+                .Property(os => os.CreatedAt)
+                .HasDefaultValueSql("getdate()");
 
             // product(M) and its Type(1)
             modelBuilder.Entity<Product>()
@@ -74,13 +80,13 @@ namespace ShopAppBackend.Models.Context
 
         public DbSet<PromotionItem> PromotionItem { get; set; }
 
-        public DbSet<PromotionItem> Order { get; set; }
+        public DbSet<Order> Order { get; set; }
 
         public DbSet<OrderState> OrderStates { get; set; }
 
-        public DbSet<PromotionItem> OrderProduct { get; set; }
+        public DbSet<OrderProduct> OrderProduct { get; set; }
 
-        public DbSet<PromotionItem> OrderPromotion { get; set; }
+        public DbSet<OrderPromotion> OrderPromotion { get; set; }
 
     }
 }

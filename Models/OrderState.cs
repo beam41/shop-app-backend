@@ -11,12 +11,11 @@ namespace ShopAppBackend.Models
     {
         public int Id { get; set; }
 
-        [Column(TypeName = "varchar(MAX)")]
+        [Column(TypeName = "varchar(33)")]
         public OrderStateEnum State { get; set; }
 
         public Order Order { get; set; }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime CreatedAt { get; set; }
 
         public string StateDataJson { get; set; }

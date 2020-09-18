@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace ShopAppBackend.Models
 {
-    public class Promotion
+    public class Promotion : IEquatable<Promotion>
     {
         public int Id { get; set; }
 
@@ -19,6 +20,20 @@ namespace ShopAppBackend.Models
         public ICollection<PromotionItem> PromotionItems { get; set; }
 
         public ICollection<OrderPromotion> OrderPromotions { get; set; }
+
+        public bool Equals(Promotion other)
+        {
+            if (ReferenceEquals(other, null)) return false;
+
+            if (ReferenceEquals(this, other)) return true;
+
+            return Id.Equals(other.Id);
+        }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
+        }
     }
 
     public class PromotionFormDTO

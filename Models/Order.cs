@@ -8,16 +8,28 @@ using ShopAppBackend.Enums;
 
 namespace ShopAppBackend.Models
 {
-    public class Order // this only work for storefront order, for now
+    public class Order
     {
         public int Id { get; set; }
 
         public User CreatedByUser { get; set; }
+
+        [Column(TypeName = "varchar(11)")]
+        public PurchaseMethodEnum PurchaseMethod { get; set; }
 
         public ICollection<OrderState> OrderStates { get; set; }
 
         public ICollection<OrderPromotion> OrderPromotions { get; set; }
 
         public ICollection<OrderProduct> OrderProducts { get; set; }
+    }
+
+    public class CreateOrderDTO
+    {
+        public ICollection<OrderProductCreateDTO> Products { get; set; }
+
+        public string AddressJson { get; set; }
+
+        public PurchaseMethodEnum PurchaseMethod { get; set; }
     }
 }

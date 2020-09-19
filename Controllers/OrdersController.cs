@@ -33,9 +33,29 @@ namespace ShopAppBackend.Controllers
 
         // GET: api/Orders/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Order>> GetOrder(int id)
+        public async Task<ActionResult<ViewOrderDTO>> GetOrder(int id)
         {
-            var order = await _context.Order.FindAsync(id);
+            var order = await _context.Order
+                .Select(o => new ViewOrderDTO
+                {
+                    Id = o.Id,
+                    PurchaseMethod = o.PurchaseMethod,
+                    OrderStates = (ICollection<OrderStateDTO>)o.OrderStates.Select(os => new OrderStateDTO
+                    {
+                        Id = os.Id,
+                        CreatedAt = os.CreatedAt,
+                        State = os.State,
+                        StateDataJson = os.StateDataJson,
+                    }),
+                    Products = (ICollection<ProductDetailDTO>)o.OrderProducts.Select(op => new ProductDetailDTO
+                    {
+                        Id = op.Product.Id,
+                        Name = op.Product.Name,
+                        Price = op.SavedPrice,
+                        NewPrice = op.SavedNewPrice
+                    })
+                })
+                .FirstOrDefaultAsync(o => o.Id == id);
 
             if (order == null)
             {
@@ -65,32 +85,35 @@ namespace ShopAppBackend.Controllers
 
             _context.Order.Add(newOrder);
 
-            // add product
-            var orderProducts = new List<OrderProduct>();
-            var products = new List<Product>();
-            var productsId = new List<int>();
-            foreach (var orderProductDto in order.Products)
-            {
-                var product = new Product { Id = orderProductDto.ProductId };
-                products.Add(product);
-                productsId.Add(orderProductDto.ProductId);
-                var orderProduct = new OrderProduct
-                {
-                    Order = newOrder,
-                    Product = product,
-                    Amount = orderProductDto.Amount
-                };
-                orderProducts.Add(orderProduct);
-            }
-
             
+            var orderProductsId = order.Products.Select(p => p.ProductId);
+
+            var products = await _context.Product
+                .Where(p => orderProductsId.Contains(p.Id))
+                .Include(p => p.PromotionItems)
+                .ThenInclude(pi => pi.Promotion)
+                .ToListAsync();
+
+            // add product
+            var orderProducts = order.Products.Select(op =>
+            {
+                var product = products.Find(p => p.Id == op.ProductId);
+                return new OrderProduct
+                {
+                    Product = product,
+                    Amount = op.Amount,
+                    Order = newOrder,
+                    SavedPrice = product.Price,
+                    SavedNewPrice = product.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted)?.NewPrice
+                };
+            });
 
             // add promotion
-            var promotions = await _context.Product
-                .Where(p => productsId.Contains(p.Id))
-                .Select(p =>  p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted).Promotion)
+            var promotions = products
+                .Select(p =>  p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted)?.Promotion)
+                .Where(p => p != null)
                 .Distinct()
-                .ToListAsync();
+                .ToList();
 
             var orderPromotion = promotions.Select(p => new OrderPromotion{ Order = newOrder, Promotion = p });
 
@@ -101,7 +124,7 @@ namespace ShopAppBackend.Controllers
 
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetOrder", new { id = newOrder.Id }, newOrder);
+            return CreatedAtAction("GetOrder", new { id = newOrder.Id }, new { id = newOrder.Id });
         }
 
     }

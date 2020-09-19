@@ -24,20 +24,20 @@ namespace ShopAppBackend.Enums
         [EnumMember(Value = "CANCELLED")]
         Cancelled,
         // for build order
-        [EnumMember(Value = "IS_ABLE_TO_BUILT")]
-        IsAbleToBuilt,
-        [EnumMember(Value = "IS_UNABLE_TO_BUILT")]
-        IsUnableToBuilt,
-        [EnumMember(Value = "CONTACT_MADE")]
-        ContactMade,
-        [EnumMember(Value = "ADDED_PROOF_OF_PAYMENT_DEPOSIT")]
-        AddedProofOfPaymentDeposit,
-        [EnumMember(Value = "APPROVED_PROOF_OF_PAYMENT_DEPOSIT")]
-        ApprovedProofOfPaymentDeposit,
-        [EnumMember(Value = "BUILT_COMPLETE")]
-        BuiltComplete,
-        [EnumMember(Value = "ADDED_ADDRESS")]
-        AddedAddress,
+        // [EnumMember(Value = "IS_ABLE_TO_BUILT")]
+        // IsAbleToBuilt,
+        // [EnumMember(Value = "IS_UNABLE_TO_BUILT")]
+        // IsUnableToBuilt,
+        // [EnumMember(Value = "CONTACT_MADE")]
+        // ContactMade,
+        // [EnumMember(Value = "ADDED_PROOF_OF_PAYMENT_DEPOSIT")]
+        // AddedProofOfPaymentDeposit,
+        // [EnumMember(Value = "APPROVED_PROOF_OF_PAYMENT_DEPOSIT")]
+        // ApprovedProofOfPaymentDeposit,
+        // [EnumMember(Value = "BUILT_COMPLETE")]
+        // BuiltComplete,
+        // [EnumMember(Value = "ADDED_ADDRESS")]
+        // AddedAddress,
         // loop back to AddedProofOfPaymentFull
     }
 }

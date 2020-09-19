@@ -24,6 +24,8 @@ namespace ShopAppBackend.Models
 
     public class OrderStateDTO
     {
+        public int Id { get; set; }
+
         public OrderStateEnum State { get; set; }
 
         public DateTime CreatedAt { get; set; }

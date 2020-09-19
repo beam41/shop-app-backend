@@ -13,13 +13,13 @@ namespace ShopAppBackend.Models
         public Product InPromotionProduct { get; set; }
 
         [Required]
-        public int NewPrice { get; set; }
+        public double NewPrice { get; set; }
     }
 
     public class PromotionItemsDTO
     {
         public int ProductId { get; set; }
 
-        public int NewPrice { get; set; }
+        public double NewPrice { get; set; }
     }
 }

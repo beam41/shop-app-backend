@@ -16,6 +16,10 @@ namespace ShopAppBackend.Models
 
         [Required]
         public int Amount { get; set; }
+
+        public double SavedPrice { get; set; }
+
+        public double? SavedNewPrice { get; set; }
     }
 
     public class OrderProductCreateDTO

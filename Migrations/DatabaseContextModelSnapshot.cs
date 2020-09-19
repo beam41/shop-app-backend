@@ -56,6 +56,12 @@ namespace ShopAppBackend.Migrations
                     b.Property<int?>("ProductId")
                         .HasColumnType("int");
 
+                    b.Property<double?>("SavedNewPrice")
+                        .HasColumnType("float");
+
+                    b.Property<double>("SavedPrice")
+                        .HasColumnType("float");
+
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId");
@@ -134,8 +140,8 @@ namespace ShopAppBackend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Price")
-                        .HasColumnType("int");
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
 
                     b.Property<int>("TypeId")
                         .HasColumnType("int");
@@ -217,8 +223,8 @@ namespace ShopAppBackend.Migrations
                     b.Property<int>("InPromotionProductId")
                         .HasColumnType("int");
 
-                    b.Property<int>("NewPrice")
-                        .HasColumnType("int");
+                    b.Property<double>("NewPrice")
+                        .HasColumnType("float");
 
                     b.Property<int>("PromotionId")
                         .HasColumnType("int");

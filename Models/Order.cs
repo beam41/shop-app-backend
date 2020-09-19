@@ -33,4 +33,15 @@ namespace ShopAppBackend.Models
 
         public PurchaseMethodEnum PurchaseMethod { get; set; }
     }
+
+    public class ViewOrderDTO
+    {
+        public int Id { get; set; }
+
+        public ICollection<ProductDetailDTO> Products { get; set; }
+
+        public PurchaseMethodEnum PurchaseMethod { get; set; }
+
+        public ICollection<OrderStateDTO> OrderStates { get; set; }
+    }
 }

@@ -67,6 +67,7 @@ namespace ShopAppBackend
             {
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
                 // options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore; 
+                options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
             });
 
             services.AddSingleton<ImageService>();

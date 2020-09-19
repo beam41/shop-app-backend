@@ -12,7 +12,7 @@ namespace ShopAppBackend.Models
         public string Name { get; set; }
 
         [Required]
-        public int Price { get; set; }
+        public double Price { get; set; }
 
         [Required]
         public string Description { get; set; }
@@ -36,7 +36,7 @@ namespace ShopAppBackend.Models
         public string Name { get; set; }
 
         [Required]
-        public int Price { get; set; }
+        public double Price { get; set; }
 
         [Required]
         public string Description { get; set; }
@@ -69,9 +69,9 @@ namespace ShopAppBackend.Models
 
         public string Name { get; set; }
 
-        public int Price { get; set; }
+        public double Price { get; set; }
 
-        public int? NewPrice { get; set; }
+        public double? NewPrice { get; set; }
 
         public string ImageUrl { get; set; }
     }
@@ -82,9 +82,9 @@ namespace ShopAppBackend.Models
 
         public string Name { get; set; }
 
-        public int Price { get; set; }
+        public double Price { get; set; }
 
-        public int? NewPrice { get; set; }
+        public double? NewPrice { get; set; }
 
         public ICollection<ProductImageUrlDTO> ImageUrls { get; set; }
 

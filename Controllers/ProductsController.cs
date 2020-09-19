@@ -100,7 +100,7 @@ namespace ShopAppBackend.Controllers
                 {
                     Id = pt.Id,
                     Name = pt.Name,
-                    ProductList = (ICollection<ProductDisplayDTO>) pt.Products
+                    ProductList = (ICollection<ProductDisplayDTO>)pt.Products
                         .Where(p => p.IsVisible)
                         .Select(p => new ProductDisplayDTO
                         {
@@ -132,7 +132,7 @@ namespace ShopAppBackend.Controllers
                     Id = p.Id,
                     Name = p.Name,
                     Description = p.Description,
-                    ProductList = (ICollection<ProductDisplayDTO>) p.PromotionItems
+                    ProductList = (ICollection<ProductDisplayDTO>)p.PromotionItems
                         .Where(pi => pi.InPromotionProduct.IsVisible)
                         .Select(pro => new ProductDisplayDTO
                         {
@@ -164,7 +164,7 @@ namespace ShopAppBackend.Controllers
                     Name = p.Name,
                     Price = p.Price,
                     NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted).NewPrice,
-                    ImageUrls = (ICollection<ProductImageUrlDTO>) p.ProductImages
+                    ImageUrls = (ICollection<ProductImageUrlDTO>)p.ProductImages
                         .Select(pi => new ProductImageUrlDTO
                         {
                             Id = pi.Id,

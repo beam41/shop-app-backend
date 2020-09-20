@@ -103,6 +103,8 @@ namespace ShopAppBackend.Models
 
         public string Type { get; set; }
 
+        public bool IsVisible { get; set; }
+
         public bool InPromotion { get; set; }
 
         public double? NewPrice { get; set; }

@@ -203,6 +203,7 @@ namespace ShopAppBackend.Controllers
                     Name = p.Name,
                     Price = p.Price,
                     Type = p.Type.Name,
+                    IsVisible = p.IsVisible,
                     InPromotion = p.PromotionItems.Any(pi => pi.Promotion.IsBroadcasted),
                     NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted).NewPrice
                 })

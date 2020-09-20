@@ -28,7 +28,7 @@ namespace ShopAppBackend.Models
         public ICollection<PromotionItem> PromotionItems { get; set; }
     }
 
-    public class ProductFormDTO
+    public class ProductAddFormDTO
     {
         public int Id { get; set; }
 
@@ -50,7 +50,43 @@ namespace ShopAppBackend.Models
         [Required]
         public ICollection<IFormFile> Images { get; set; }
 
-        public static implicit operator Product(ProductFormDTO p)
+        public static implicit operator Product(ProductAddFormDTO p)
+        {
+            return new Product
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Price = p.Price,
+                Description = p.Description,
+                IsVisible = p.IsVisible
+            };
+        }
+    }
+
+    public class ProductEditFormDTO
+    {
+        public int Id { get; set; }
+
+        [Required]
+        public string Name { get; set; }
+
+        [Required]
+        public double Price { get; set; }
+
+        [Required]
+        public string Description { get; set; }
+
+        [Required]
+        public bool IsVisible { get; set; }
+
+        [Required]
+        public int TypeId { get; set; }
+
+        public ICollection<IFormFile> Images { get; set; }
+
+        public ICollection<int> MarkForDeleteId { get; set; }
+
+        public static implicit operator Product(ProductEditFormDTO p)
         {
             return new Product
             {

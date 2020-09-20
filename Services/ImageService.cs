@@ -26,6 +26,12 @@ namespace ShopAppBackend.Services
             return Url.Combine(_imageSettings.BlobPath, _imageSettings.ContainerName, fileName);
         }
 
+        public void DeleteFile(string fileName)
+        {
+            BlobClient blobClient = new BlobClient(_imageSettings.ConnectionString, _imageSettings.ContainerName, fileName);
+            blobClient.DeleteIfExists();
+        }
+
         public async Task<string> Uploader(IFormFile image)
         {
             var fileName = Guid.NewGuid().ToString() + ".jpg";

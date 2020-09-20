@@ -211,9 +211,15 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpGet("{id}/admin")]
-        [AllowAnonymous]
         public async Task<ActionResult<ProductDetailAdminDTO>> GetProductAdmin(int id)
         {
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            if (tokenId != 1)
+            {
+                return Unauthorized();
+            }
+
             var product = await _context.Product
                 .Select(p => new ProductDetailAdminDTO
                 {
@@ -238,7 +244,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Product>> PostProduct([FromForm] ProductFormDTO product)
+        public async Task<ActionResult<Product>> AddProduct([FromForm] ProductAddFormDTO productAdd)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
@@ -247,13 +253,13 @@ namespace ShopAppBackend.Controllers
                 return Unauthorized();
             }
 
-            var type = new ProductType { Id = product.TypeId };
+            var type = new ProductType { Id = productAdd.TypeId };
             _context.Attach(type);
-            Product newProduct = product;
+            Product newProduct = productAdd;
             newProduct.Type = type;
 
             newProduct.ProductImages = new List<ProductImage>();
-            var fileNameList = product.Images.Select(async p =>
+            var fileNameList = productAdd.Images.Select(async p =>
             {
                 var fileName = await _imageService.Uploader(p);
                 var pi = new ProductImage { ImageFileName = fileName };
@@ -267,6 +273,51 @@ namespace ShopAppBackend.Controllers
             await _context.SaveChangesAsync();
             GC.Collect();
             return CreatedAtAction("GetProductAdmin", new { id = newProduct.Id }, newProduct);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<Product>> EditProduct(int id, [FromForm] ProductEditFormDTO productEdit)
+        {
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            if (tokenId != 1)
+            {
+                return Unauthorized();
+            }
+
+            var type = new ProductType { Id = productEdit.TypeId };
+            _context.Attach(type);
+            var product = await _context.Product.Include(p => p.ProductImages).FirstOrDefaultAsync(p => p.Id == id);
+            _context.Attach(product);
+            product.Name = productEdit.Name;
+            product.Price = productEdit.Price;
+            product.Description = productEdit.Description;
+            product.Type = type;
+            product.IsVisible = productEdit.IsVisible;
+
+            var markForDelImages = product.ProductImages.Where(pi => productEdit.MarkForDeleteId.Contains(pi.Id));
+            product.ProductImages = product.ProductImages.Where(pi => !productEdit.MarkForDeleteId.Contains(pi.Id)).ToList();
+            var fileNameList = productEdit.Images?.Select(async p =>
+            {
+                var fileName = await _imageService.Uploader(p);
+                var pi = new ProductImage { ImageFileName = fileName };
+                product.ProductImages.Add(pi);
+            }).ToArray();
+
+            if (fileNameList != null)
+            {
+                Task.WaitAll(fileNameList);
+            }
+
+            await _context.SaveChangesAsync();
+
+            foreach (var productImage in markForDelImages)
+            {
+                _imageService.DeleteFile(productImage.ImageFileName);
+            }
+
+            GC.Collect();
+            return NoContent();
         }
 
         private Task<bool> ProductExists(int id)

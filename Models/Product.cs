@@ -109,4 +109,21 @@ namespace ShopAppBackend.Models
 
         public double? NewPrice { get; set; }
     }
+
+    public class ProductDetailAdminDTO
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public double Price { get; set; }
+
+        public string Description { get; set; }
+
+        public bool IsVisible { get; set; }
+
+        public int TypeId { get; set; }
+
+        public ICollection<ProductImageUrlDTO> Images { get; set; }
+    }
 }

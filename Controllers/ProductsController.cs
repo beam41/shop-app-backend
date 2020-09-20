@@ -210,7 +210,34 @@ namespace ShopAppBackend.Controllers
                 .ToListAsync();
         }
 
-        [HttpPost("img")]
+        [HttpGet("{id}/admin")]
+        [AllowAnonymous]
+        public async Task<ActionResult<ProductDetailAdminDTO>> GetProductAdmin(int id)
+        {
+            var product = await _context.Product
+                .Select(p => new ProductDetailAdminDTO
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Price = p.Price,
+                    Images = (ICollection<ProductImageUrlDTO>)p.ProductImages
+                        .Select(pi => new ProductImageUrlDTO
+                        {
+                            Id = pi.Id,
+                            ImageUrl = _imageService.GetImageUrl(pi.ImageFileName)
+                        }),
+                    Description = p.Description,
+                    IsVisible = p.IsVisible,
+                    TypeId = p.Type.Id
+                })
+                .FirstOrDefaultAsync(i => i.Id == id);
+
+            if (product == null) return NotFound();
+
+            return product;
+        }
+
+        [HttpPost]
         public async Task<ActionResult<Product>> PostProduct([FromForm] ProductFormDTO product)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
@@ -239,7 +266,7 @@ namespace ShopAppBackend.Controllers
 
             await _context.SaveChangesAsync();
             GC.Collect();
-            return CreatedAtAction("GetProduct", new { id = newProduct.Id }, newProduct);
+            return CreatedAtAction("GetProductAdmin", new { id = newProduct.Id }, newProduct);
         }
 
         private Task<bool> ProductExists(int id)

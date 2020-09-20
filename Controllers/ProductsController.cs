@@ -8,11 +8,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ShopAppBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ProductsController : ControllerBase
     {
         private readonly DatabaseContext _context;
@@ -37,6 +39,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpGet("recommend")]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<ProductDisplayDTO>>> GetRecommend()
         {
             if (!int.TryParse(Request.Query["amount"], out var amount)) return BadRequest();
@@ -64,6 +67,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpGet("type/{type}")]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<ProductDisplayDTO>>> GetByType(string type)
         {
             if (!await ProductTypeExists(type)) return NotFound();
@@ -90,6 +94,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpGet("type")]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<ProductTypeDisplayDTO>>> GetAllTypeAndProduct()
         {
             if (!int.TryParse(Request.Query["amount"], out var amount)) return BadRequest();
@@ -123,6 +128,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpGet("promotion")]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<PromotionDisplayDTO>>> GetAllPromotionAndProduct()
         {
             return await _context.Promotion
@@ -153,8 +159,8 @@ namespace ShopAppBackend.Controllers
                 .ToListAsync();
         }
 
-        // GET: api/Products/5
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<ProductDetailDTO>> GetProduct(int id)
         {
             var product = await _context.Product
@@ -180,22 +186,39 @@ namespace ShopAppBackend.Controllers
             return product;
         }
 
-        [HttpPost]
-        public async Task<ActionResult<Product>> PostProduct(ProductFormDTO product)
+        [HttpGet("list")]
+        public async Task<ActionResult<IEnumerable<ProductListDTO>>> GetProductList()
         {
-            var type = new ProductType { Id = product.TypeId };
-            _context.Attach(type);
-            Product newProduct = product;
-            newProduct.Type = type;
-            _context.Product.Add(newProduct);
-            await _context.SaveChangesAsync();
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
-            return CreatedAtAction("GetProduct", new { id = newProduct.Id }, newProduct);
+            if (tokenId != 1)
+            {
+                return Unauthorized();
+            }
+
+            return await _context.Product
+                .Select(p => new ProductListDTO
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Price = p.Price,
+                    Type = p.Type.Name,
+                    InPromotion = p.PromotionItems.Any(pi => pi.Promotion.IsBroadcasted),
+                    NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted).NewPrice
+                })
+                .ToListAsync();
         }
 
         [HttpPost("img")]
-        public async Task<ActionResult<Product>> PostProductImg([FromForm] ProductFormDTO product)
+        public async Task<ActionResult<Product>> PostProduct([FromForm] ProductFormDTO product)
         {
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            if (tokenId != 1)
+            {
+                return Unauthorized();
+            }
+
             var type = new ProductType { Id = product.TypeId };
             _context.Attach(type);
             Product newProduct = product;

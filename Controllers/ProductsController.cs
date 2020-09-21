@@ -295,8 +295,13 @@ namespace ShopAppBackend.Controllers
             product.Type = type;
             product.IsVisible = productEdit.IsVisible;
 
-            var markForDelImages = product.ProductImages.Where(pi => productEdit.MarkForDeleteId.Contains(pi.Id));
-            product.ProductImages = product.ProductImages.Where(pi => !productEdit.MarkForDeleteId.Contains(pi.Id)).ToList();
+            IEnumerable<ProductImage> markForDelImages = new List<ProductImage>();
+            if (productEdit.MarkForDeleteId != null)
+            {
+                markForDelImages = product.ProductImages.Where(pi => productEdit.MarkForDeleteId.Contains(pi.Id));
+                product.ProductImages = product.ProductImages.Where(pi => !productEdit.MarkForDeleteId.Contains(pi.Id)).ToList();
+            }
+            
             var fileNameList = productEdit.Images?.Select(async p =>
             {
                 var fileName = await _imageService.Uploader(p);

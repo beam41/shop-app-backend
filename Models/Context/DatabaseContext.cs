@@ -23,6 +23,14 @@ namespace ShopAppBackend.Models.Context
                 .Property(os => os.CreatedAt)
                 .HasDefaultValueSql("getdate()");
 
+            modelBuilder.Entity<Product>()
+                .Property(p => p.Archived)
+                .HasDefaultValue(false);
+
+            modelBuilder.Entity<ProductType>()
+                .Property(pt => pt.Archived)
+                .HasDefaultValue(false);
+
             modelBuilder.Entity<OrderState>()
                 .Property(e => e.StateDataJson).HasConversion(
                 os => JsonConvert.SerializeObject(os),

@@ -45,7 +45,7 @@ namespace ShopAppBackend.Controllers
             if (!int.TryParse(Request.Query["amount"], out var amount)) return BadRequest();
 
             return await _context.Product
-                .Where(p => p.IsVisible)
+                .Where(p => p.IsVisible && !p.Archived)
                 .Select(p => new ProductDisplayDTO
                 {
                     Id = p.Id,
@@ -73,7 +73,7 @@ namespace ShopAppBackend.Controllers
             if (!await ProductTypeExists(type)) return NotFound();
 
             var query = _context.Product
-                .Where(p => p.IsVisible && p.Type.Name == type)
+                .Where(p => p.IsVisible && !p.Archived && p.Type.Name == type)
                 .Select(p => new ProductDisplayDTO
                 {
                     Id = p.Id,
@@ -106,7 +106,7 @@ namespace ShopAppBackend.Controllers
                     Id = pt.Id,
                     Name = pt.Name,
                     ProductList = (ICollection<ProductDisplayDTO>)pt.Products
-                        .Where(p => p.IsVisible)
+                        .Where(p => p.IsVisible && !p.Archived)
                         .Select(p => new ProductDisplayDTO
                         {
                             Id = p.Id,
@@ -139,7 +139,7 @@ namespace ShopAppBackend.Controllers
                     Name = p.Name,
                     Description = p.Description,
                     ProductList = (ICollection<ProductDisplayDTO>)p.PromotionItems
-                        .Where(pi => pi.InPromotionProduct.IsVisible)
+                        .Where(pi => pi.InPromotionProduct.IsVisible && !pi.InPromotionProduct.Archived)
                         .Select(pro => new ProductDisplayDTO
                         {
                             Id = pro.InPromotionProduct.Id,
@@ -164,6 +164,7 @@ namespace ShopAppBackend.Controllers
         public async Task<ActionResult<ProductDetailDTO>> GetProduct(int id)
         {
             var product = await _context.Product
+                .Where(p => !p.Archived)
                 .Select(p => new ProductDetailDTO
                 {
                     Id = p.Id,
@@ -197,6 +198,7 @@ namespace ShopAppBackend.Controllers
             }
 
             return await _context.Product
+                .Where(p => !p.Archived)
                 .Select(p => new ProductListDTO
                 {
                     Id = p.Id,
@@ -221,6 +223,7 @@ namespace ShopAppBackend.Controllers
             }
 
             var product = await _context.Product
+                .Where(p => !p.Archived)
                 .Select(p => new ProductDetailAdminDTO
                 {
                     Id = p.Id,
@@ -236,7 +239,7 @@ namespace ShopAppBackend.Controllers
                     IsVisible = p.IsVisible,
                     TypeId = p.Type.Id
                 })
-                .FirstOrDefaultAsync(i => i.Id == id);
+                .FirstOrDefaultAsync(p => p.Id == id);
 
             if (product == null) return NotFound();
 
@@ -285,9 +288,16 @@ namespace ShopAppBackend.Controllers
                 return Unauthorized();
             }
 
+            var product = await _context.Product.Include(p => p.ProductImages).FirstOrDefaultAsync(p => p.Id == id && !p.Archived);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
             var type = new ProductType { Id = productEdit.TypeId };
             _context.Attach(type);
-            var product = await _context.Product.Include(p => p.ProductImages).FirstOrDefaultAsync(p => p.Id == id);
+
             _context.Attach(product);
             product.Name = productEdit.Name;
             product.Price = productEdit.Price;
@@ -325,9 +335,28 @@ namespace ShopAppBackend.Controllers
             return NoContent();
         }
 
-        private Task<bool> ProductExists(int id)
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Product>> ArchiveProduct(int id)
         {
-            return _context.Product.AnyAsync(e => e.Id == id);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            if (tokenId != 1)
+            {
+                return Unauthorized();
+            }
+
+            var product = await _context.Product.Include(p => p.ProductImages).FirstOrDefaultAsync(p => p.Id == id);
+            product.IsVisible = false;
+            product.Archived = true;
+
+            await _context.SaveChangesAsync();
+
+            foreach (var productImage in product.ProductImages)
+            {
+                _imageService.DeleteFile(productImage.ImageFileName);
+            }
+
+            return product;
         }
 
         private Task<bool> ProductTypeExists(string name)

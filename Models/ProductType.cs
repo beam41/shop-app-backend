@@ -10,6 +10,8 @@ namespace ShopAppBackend.Models
         [Required]
         public string Name { get; set; }
 
+        public bool Archived { get; set; }
+
         public ICollection<Product> Products { get; set; }
     }
 
@@ -20,5 +22,20 @@ namespace ShopAppBackend.Models
         public string Name { get; set; }
 
         public ICollection<ProductDisplayDTO> ProductList { get; set; }
+    }
+
+    public class ProductTypeInputDTO
+    {
+        [Required]
+        public string Name { get; set; }
+    }
+
+    public class ProductTypeDetailDTO
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public ICollection<ProductListInTypeDTO> ProductList { get; set; }
     }
 }

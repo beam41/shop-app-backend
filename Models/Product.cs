@@ -20,6 +20,8 @@ namespace ShopAppBackend.Models
         [Required]
         public bool IsVisible { get; set; }
 
+        public bool Archived { get; set; }
+
         [Required]
         public ProductType Type { get; set; }
 
@@ -161,5 +163,14 @@ namespace ShopAppBackend.Models
         public int TypeId { get; set; }
 
         public ICollection<ProductImageUrlDTO> Images { get; set; }
+    }
+
+    public class ProductListInTypeDTO
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public bool IsVisible { get; set; }
     }
 }

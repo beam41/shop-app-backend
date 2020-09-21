@@ -3,12 +3,15 @@ using Microsoft.EntityFrameworkCore;
 using ShopAppBackend.Models;
 using ShopAppBackend.Models.Context;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ShopAppBackend.Controllers
 {
     [Route("api/types")]
     [ApiController]
+    [Authorize]
     public class ProductTypesController : ControllerBase
     {
         private readonly DatabaseContext _context;
@@ -22,14 +25,38 @@ namespace ShopAppBackend.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductType>>> GetProductType()
         {
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            if (tokenId != 1)
+            {
+                return Unauthorized();
+            }
+
             return await _context.ProductType.ToListAsync();
         }
 
         // GET: api/ProductTypes/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ProductType>> GetProductType(int id)
+        public async Task<ActionResult<ProductTypeDetailDTO>> GetProductType(int id)
         {
-            var productType = await _context.ProductType.FindAsync(id);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            if (tokenId != 1)
+            {
+                return Unauthorized();
+            }
+
+            var productType = await _context.ProductType.Select(p => new ProductTypeDetailDTO
+            {
+                Id = p.Id,
+                Name = p.Name,
+                ProductList = (ICollection<ProductListInTypeDTO>) p.Products.Select(pro => new ProductListInTypeDTO
+                {
+                    Id = pro.Id,
+                    Name = pro.Name,
+                    IsVisible = pro.IsVisible
+                })
+            }).FirstOrDefaultAsync(p => p.Id == id);
 
             if (productType == null)
             {
@@ -43,30 +70,21 @@ namespace ShopAppBackend.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProductType(int id, ProductType productType)
+        public async Task<IActionResult> EditProductType(int id, ProductTypeInputDTO productType)
         {
-            if (id != productType.Id)
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            if (tokenId != 1)
             {
-                return BadRequest();
+                return Unauthorized();
             }
 
-            _context.Entry(productType).State = EntityState.Modified;
+            var productTypeOld = new ProductType() { Id = id };
+            _context.Attach(productTypeOld);
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await ProductTypeExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            productTypeOld.Name = productType.Name;
+
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
@@ -75,33 +93,52 @@ namespace ShopAppBackend.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<ProductType>> PostProductType(ProductType productType)
+        public async Task<ActionResult<ProductType>> AddProductType(ProductTypeInputDTO productType)
         {
-            _context.ProductType.Add(productType);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            if (tokenId != 1)
+            {
+                return Unauthorized();
+            }
+
+            var newProductType = new ProductType() { Name = productType.Name };
+
+            _context.ProductType.Add(newProductType);
+
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetProductType", new { id = productType.Id }, productType);
+            return CreatedAtAction("GetProductType", new { id = newProductType.Id }, productType);
         }
 
         // DELETE: api/ProductTypes/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ProductType>> DeleteProductType(int id)
+        public async Task<ActionResult<ProductType>> ArchiveProductType(int id)
         {
-            var productType = await _context.ProductType.FindAsync(id);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            if (tokenId != 1)
+            {
+                return Unauthorized();
+            }
+
+            var productType = await _context.ProductType.Include(pt => pt.Products).FirstOrDefaultAsync(pt => pt.Id == id);
+
             if (productType == null)
             {
                 return NotFound();
             }
 
-            _context.ProductType.Remove(productType);
+            if (productType.Products.Count > 0)
+            {
+                return BadRequest();
+            }
+
+            productType.Archived = true;
+
             await _context.SaveChangesAsync();
 
             return productType;
-        }
-
-        private Task<bool> ProductTypeExists(int id)
-        {
-            return _context.ProductType.AnyAsync(e => e.Id == id);
         }
     }
 }

@@ -79,12 +79,14 @@ namespace ShopAppBackend.Controllers
                 {
                     Id = p.Id,
                     Name = p.Name,
-                    ProductList = (ICollection<ProductListInTypeDTO>) p.Products.Select(pro => new ProductListInTypeDTO
-                    {
-                        Id = pro.Id,
-                        Name = pro.Name,
-                        IsVisible = pro.IsVisible
-                    })
+                    ProductList = (ICollection<ProductListInTypeDTO>) p.Products
+                        .Where(p => !p.Archived)
+                        .Select(pro => new ProductListInTypeDTO
+                        {
+                            Id = pro.Id,
+                            Name = pro.Name,
+                            IsVisible = pro.IsVisible
+                        })
                 }).FirstOrDefaultAsync(p => p.Id == id);
 
             if (productType == null)

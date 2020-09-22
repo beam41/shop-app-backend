@@ -26,7 +26,7 @@ namespace ShopAppBackend.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<ProductType>>> GetProductType()
         {
-            return await _context.ProductType.Where(pt => !pt.Archived && pt.Products.Count > 0).ToListAsync();
+            return await _context.ProductType.Where(pt => !pt.Archived && pt.Products.Count(p => !p.Archived) > 0).ToListAsync();
         }
 
         [HttpGet("admin")]
@@ -58,7 +58,7 @@ namespace ShopAppBackend.Controllers
                 {
                     Id = pt.Id,
                     Name = pt.Name,
-                    ProductCount = pt.Products.Count
+                    ProductCount = pt.Products.Count(p => !p.Archived)
                 }).ToListAsync();
         }
 
@@ -158,7 +158,7 @@ namespace ShopAppBackend.Controllers
                 return NotFound();
             }
 
-            if (productType.Products.Count > 0)
+            if (productType.Products.Count(p => !p.Archived) > 0)
             {
                 return BadRequest();
             }

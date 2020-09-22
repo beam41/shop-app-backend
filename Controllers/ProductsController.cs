@@ -348,13 +348,18 @@ namespace ShopAppBackend.Controllers
             var product = await _context.Product.Include(p => p.ProductImages).FirstOrDefaultAsync(p => p.Id == id);
             product.IsVisible = false;
             product.Archived = true;
+            
 
-            await _context.SaveChangesAsync();
+            
 
             foreach (var productImage in product.ProductImages)
             {
                 _imageService.DeleteFile(productImage.ImageFileName);
             }
+
+            product.ProductImages = new List<ProductImage>();
+
+            await _context.SaveChangesAsync();
 
             return product;
         }

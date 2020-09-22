@@ -23,7 +23,14 @@ namespace ShopAppBackend.Controllers
 
         // GET: api/ProductTypes
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<ProductType>>> GetProductType()
+        {
+            return await _context.ProductType.Where(pt => !pt.Archived && pt.Products.Count > 0).ToListAsync();
+        }
+
+        [HttpGet("admin")]
+        public async Task<ActionResult<IEnumerable<ProductType>>> GetProductTypeAdmin()
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
@@ -32,7 +39,27 @@ namespace ShopAppBackend.Controllers
                 return Unauthorized();
             }
 
-            return await _context.ProductType.ToListAsync();
+            return await _context.ProductType.Where(pt => !pt.Archived).ToListAsync();
+        }
+
+        [HttpGet("list")]
+        public async Task<ActionResult<IEnumerable<ProductTypeListDTO>>> GetProductTypeList()
+        {
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            if (tokenId != 1)
+            {
+                return Unauthorized();
+            }
+
+            return await _context.ProductType
+                .Where(pt => !pt.Archived)
+                .Select(pt => new ProductTypeListDTO
+                {
+                    Id = pt.Id,
+                    Name = pt.Name,
+                    ProductCount = pt.Products.Count
+                }).ToListAsync();
         }
 
         // GET: api/ProductTypes/5
@@ -46,17 +73,19 @@ namespace ShopAppBackend.Controllers
                 return Unauthorized();
             }
 
-            var productType = await _context.ProductType.Select(p => new ProductTypeDetailDTO
-            {
-                Id = p.Id,
-                Name = p.Name,
-                ProductList = (ICollection<ProductListInTypeDTO>) p.Products.Select(pro => new ProductListInTypeDTO
+            var productType = await _context.ProductType
+                .Where(pt => !pt.Archived)
+                .Select(p => new ProductTypeDetailDTO
                 {
-                    Id = pro.Id,
-                    Name = pro.Name,
-                    IsVisible = pro.IsVisible
-                })
-            }).FirstOrDefaultAsync(p => p.Id == id);
+                    Id = p.Id,
+                    Name = p.Name,
+                    ProductList = (ICollection<ProductListInTypeDTO>) p.Products.Select(pro => new ProductListInTypeDTO
+                    {
+                        Id = pro.Id,
+                        Name = pro.Name,
+                        IsVisible = pro.IsVisible
+                    })
+                }).FirstOrDefaultAsync(p => p.Id == id);
 
             if (productType == null)
             {

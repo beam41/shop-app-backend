@@ -19,12 +19,31 @@ namespace ShopAppBackend.Controllers
         {
             _context = context;
         }
-
-        // GET: api/Promotions
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Promotion>>> GetPromotion()
         {
             return await _context.Promotion.Include(p => p.PromotionItems).ToListAsync();
+        }
+
+        [HttpGet("list")]
+        public async Task<ActionResult<IEnumerable<PromotionListDTO>>> GetPromotionList()
+        {
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            if (tokenId != 1)
+            {
+                return Unauthorized();
+            }
+
+            return await _context.Promotion
+                .Where(p => !p.Archived)
+                .Select(p => new PromotionListDTO()
+                {
+                    Id = p.Id,
+                    IsBroadcasted = p.IsBroadcasted,
+                    Name = p.Name,
+                    PromotionItemsCount = p.PromotionItems.Count(p => !p.InPromotionProduct.Archived)
+                }).ToListAsync();
         }
 
         // GET: api/Promotions/5

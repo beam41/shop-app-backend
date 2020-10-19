@@ -153,16 +153,11 @@ namespace ShopAppBackend.Controllers
                 return Unauthorized();
             }
 
-            var productType = await _context.ProductType.Include(pt => pt.Products).FirstOrDefaultAsync(pt => pt.Id == id);
+            var productType = await _context.ProductType.Where(pt => pt.Products.All(p => p.Archived)).FirstOrDefaultAsync(pt => pt.Id == id);
 
             if (productType == null)
             {
                 return NotFound();
-            }
-
-            if (productType.Products.Count(p => !p.Archived) > 0)
-            {
-                return BadRequest();
             }
 
             productType.Archived = true;

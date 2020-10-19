@@ -51,7 +51,7 @@ namespace ShopAppBackend.Controllers
                     Id = p.Id,
                     Name = p.Name,
                     Price = p.Price,
-                    NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted).NewPrice,
+                    NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived).NewPrice,
                     ImageUrl = p.ProductImages
                         .Select(pi => new ProductImageUrlDTO
                         {
@@ -79,7 +79,7 @@ namespace ShopAppBackend.Controllers
                     Id = p.Id,
                     Name = p.Name,
                     Price = p.Price,
-                    NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted).NewPrice,
+                    NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived).NewPrice,
                     ImageUrl = p.ProductImages
                         .Select(pi => new ProductImageUrlDTO
                         {
@@ -100,7 +100,7 @@ namespace ShopAppBackend.Controllers
             if (!int.TryParse(Request.Query["amount"], out var amount)) return BadRequest();
 
             return await _context.ProductType
-                .Where(pt => pt.Products.Any())
+                .Where(pt => !pt.Archived && pt.Products.Any(p => p.IsVisible && !p.Archived))
                 .Select(pt => new ProductTypeDisplayDTO
                 {
                     Id = pt.Id,
@@ -112,7 +112,7 @@ namespace ShopAppBackend.Controllers
                             Id = p.Id,
                             Name = p.Name,
                             Price = p.Price,
-                            NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted).NewPrice,
+                            NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived).NewPrice,
                             ImageUrl = p.ProductImages
                                 .Select(pi => new ProductImageUrlDTO
                                 {
@@ -132,7 +132,7 @@ namespace ShopAppBackend.Controllers
         public async Task<ActionResult<IEnumerable<PromotionDisplayDTO>>> GetAllPromotionAndProduct()
         {
             return await _context.Promotion
-                .Where(p => p.IsBroadcasted)
+                .Where(p => p.IsBroadcasted && !p.Archived && p.PromotionItems.Any(p => p.InPromotionProduct.IsVisible && !p.InPromotionProduct.Archived))
                 .Select(p => new PromotionDisplayDTO
                 {
                     Id = p.Id,
@@ -170,7 +170,7 @@ namespace ShopAppBackend.Controllers
                     Id = p.Id,
                     Name = p.Name,
                     Price = p.Price,
-                    NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted).NewPrice,
+                    NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived).NewPrice,
                     ImageUrls = (ICollection<ProductImageUrlDTO>)p.ProductImages
                         .Select(pi => new ProductImageUrlDTO
                         {
@@ -178,7 +178,7 @@ namespace ShopAppBackend.Controllers
                             ImageUrl = _imageService.GetImageUrl(pi.ImageFileName)
                         }),
                     Description = p.Description,
-                    Promotion = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted).Promotion
+                    Promotion = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived).Promotion
                 })
                 .FirstOrDefaultAsync(i => i.Id == id);
 
@@ -206,8 +206,8 @@ namespace ShopAppBackend.Controllers
                     Price = p.Price,
                     Type = p.Type.Name,
                     IsVisible = p.IsVisible,
-                    InPromotion = p.PromotionItems.Any(pi => pi.Promotion.IsBroadcasted),
-                    NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted).NewPrice
+                    InPromotion = p.PromotionItems.Any(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived),
+                    NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived).NewPrice
                 })
                 .ToListAsync();
         }

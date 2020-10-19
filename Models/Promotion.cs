@@ -17,6 +17,8 @@ namespace ShopAppBackend.Models
         [Required]
         public bool IsBroadcasted { get; set; }
 
+        public bool Archived { get; set; }
+
         public ICollection<PromotionItem> PromotionItems { get; set; }
 
         public ICollection<OrderPromotion> OrderPromotions { get; set; }
@@ -89,5 +91,16 @@ namespace ShopAppBackend.Models
             }
             return null;
         }
+    }
+
+    public class PromotionListDTO
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public bool IsBroadcasted { get; set; }
+
+        public int PromotionItemsCount { get; set; }
     }
 }

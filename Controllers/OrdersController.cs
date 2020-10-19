@@ -104,13 +104,13 @@ namespace ShopAppBackend.Controllers
                     Amount = op.Amount,
                     Order = newOrder,
                     SavedPrice = product.Price,
-                    SavedNewPrice = product.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted)?.NewPrice
+                    SavedNewPrice = product.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived)?.NewPrice
                 };
             });
 
             // add promotion
             var promotions = products
-                .Select(p =>  p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted)?.Promotion)
+                .Select(p =>  p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived)?.Promotion)
                 .Where(p => p != null)
                 .Distinct()
                 .ToList();

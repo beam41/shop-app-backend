@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Primitives;
 
 namespace ShopAppBackend.Controllers
 {
@@ -132,7 +133,7 @@ namespace ShopAppBackend.Controllers
         public async Task<ActionResult<IEnumerable<PromotionDisplayDTO>>> GetAllPromotionAndProduct()
         {
             return await _context.Promotion
-                .Where(p => p.IsBroadcasted && !p.Archived && p.PromotionItems.Any(p => p.InPromotionProduct.IsVisible && !p.InPromotionProduct.Archived))
+                .Where(p => p.IsBroadcasted && !p.Archived && p.PromotionItems.Any(pi => pi.InPromotionProduct.IsVisible && !pi.InPromotionProduct.Archived))
                 .Select(p => new PromotionDisplayDTO
                 {
                     Id = p.Id,
@@ -246,6 +247,34 @@ namespace ShopAppBackend.Controllers
             return product;
         }
 
+        [HttpGet("search")]
+        [AllowAnonymous]
+        public async Task<ActionResult<List<ProductListDTO>>> SearchProduct()
+        {
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            if (tokenId != 1)
+            {
+                return Unauthorized();
+            }
+
+            var query = Request.Query["q"];
+            if (StringValues.IsNullOrEmpty(query)) return BadRequest();
+
+            var product = await _context.Product
+                .Where(p => !p.Archived && !p.PromotionItems.Any(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived) && p.Name.Contains(query))
+                .Select(p => new ProductListDTO
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Price = p.Price,
+                    IsVisible = p.IsVisible,
+                })
+                .ToListAsync();
+
+            return product;
+        }
+
         [HttpPost]
         public async Task<ActionResult<Product>> AddProduct([FromForm] ProductAddFormDTO productAdd)
         {
@@ -311,7 +340,7 @@ namespace ShopAppBackend.Controllers
                 markForDelImages = product.ProductImages.Where(pi => productEdit.MarkForDeleteId.Contains(pi.Id));
                 product.ProductImages = product.ProductImages.Where(pi => !productEdit.MarkForDeleteId.Contains(pi.Id)).ToList();
             }
-            
+
             var fileNameList = productEdit.Images?.Select(async p =>
             {
                 var fileName = await _imageService.Uploader(p);
@@ -348,9 +377,9 @@ namespace ShopAppBackend.Controllers
             var product = await _context.Product.Include(p => p.ProductImages).FirstOrDefaultAsync(p => p.Id == id);
             product.IsVisible = false;
             product.Archived = true;
-            
 
-            
+
+
 
             foreach (var productImage in product.ProductImages)
             {

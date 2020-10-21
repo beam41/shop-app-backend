@@ -101,6 +101,19 @@ namespace ShopAppBackend.Models
 
         public bool IsBroadcasted { get; set; }
 
-        public int PromotionItemsCount { get; set; }
+        public int ItemsCount { get; set; }
+    }
+
+    public class PromotionDetailDTO
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public string Description { get; set; }
+
+        public bool IsBroadcasted { get; set; }
+
+        public ICollection<ProductDetailPromotionDTO> PromotionItems { get; set; }
     }
 }

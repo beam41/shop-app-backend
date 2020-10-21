@@ -19,6 +19,7 @@ namespace ShopAppBackend.Controllers
         {
             _context = context;
         }
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Promotion>>> GetPromotion()
         {
@@ -42,15 +43,54 @@ namespace ShopAppBackend.Controllers
                     Id = p.Id,
                     IsBroadcasted = p.IsBroadcasted,
                     Name = p.Name,
-                    PromotionItemsCount = p.PromotionItems.Count(p => !p.InPromotionProduct.Archived)
+                    ItemsCount = p.PromotionItems.Count(p => !p.InPromotionProduct.Archived)
                 }).ToListAsync();
         }
 
         // GET: api/Promotions/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Promotion>> GetPromotion(int id)
+        public async Task<ActionResult<PromotionDetailDTO>> GetPromotion(int id)
         {
-            var promotion = await _context.Promotion.FindAsync(id);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            if (tokenId != 1)
+            {
+                return Unauthorized();
+            }
+
+            var promotion = await _context.Promotion.Select(pro => new PromotionDetailDTO()
+            {
+                Id = pro.Id,
+                Description = pro.Description,
+                IsBroadcasted = pro.IsBroadcasted,
+                Name = pro.Name,
+                PromotionItems = (ICollection<ProductDetailPromotionDTO>)pro.PromotionItems
+                    .Where(pi => pi.InPromotionProduct.IsVisible && !pi.InPromotionProduct.Archived)
+                    .Select(pi => new ProductDetailPromotionDTO
+                    {
+                        Id = pi.InPromotionProduct.Id,
+                        Name = pi.InPromotionProduct.Name,
+                        Price = pi.InPromotionProduct.Price,
+                        NewPrice = pi.NewPrice,
+                        IsVisible = pi.InPromotionProduct.IsVisible,
+                        OnSale = pi
+                            .InPromotionProduct
+                            .PromotionItems
+                            .Any(pip => pip.Promotion.IsBroadcasted && !pip.Promotion.Archived),
+                        OnSaleCurrPromotion =
+                            pi
+                                .InPromotionProduct
+                                .PromotionItems
+                                .Any(pip => pip.Promotion.IsBroadcasted && !pip.Promotion.Archived)
+                                ? pi
+                                    .InPromotionProduct
+                                    .PromotionItems
+                                    .FirstOrDefault(pip => pip.Promotion.IsBroadcasted && !pip.Promotion.Archived)
+                                    .Promotion
+                                    .Id == id
+                                : (bool?)null
+                    })
+            }).FirstOrDefaultAsync(p => p.Id == id);
 
             if (promotion == null)
             {
@@ -84,8 +124,10 @@ namespace ShopAppBackend.Controllers
                         InPromotionProduct = product,
                         NewPrice = promotionItemDTO.NewPrice
                     };
+
                     promotionItems.Add(promotionItem);
                 }
+
                 _context.AttachRange(products);
                 _context.PromotionItem.AddRange(promotionItems);
                 await _context.SaveChangesAsync();

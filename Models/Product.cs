@@ -165,6 +165,23 @@ namespace ShopAppBackend.Models
         public ICollection<ProductImageUrlDTO> Images { get; set; }
     }
 
+    public class ProductDetailPromotionDTO
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public double Price { get; set; }
+
+        public double? NewPrice { get; set; }
+
+        public bool IsVisible { get; set; }
+
+        public bool OnSale { get; set; }
+
+        public bool? OnSaleCurrPromotion { get; set; }
+    }
+
     public class ProductListInTypeDTO
     {
         public int Id { get; set; }

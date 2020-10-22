@@ -106,42 +106,130 @@ namespace ShopAppBackend.Controllers
         [HttpPost]
         public async Task<ActionResult<Promotion>> PostPromotion(PromotionFormDTO promotion)
         {
-            var productIdList = promotion.PromotionItems.Select(p => p.ProductId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
-            if (!await ProductPromotionIsActive(productIdList))
+            if (tokenId != 1)
             {
-                Promotion newPromotion = promotion;
-                _context.Promotion.Add(newPromotion);
-                var promotionItems = new List<PromotionItem>();
-                var products = new List<Product>();
-                foreach (PromotionItemsDTO promotionItemDTO in promotion.PromotionItems)
-                {
-                    var product = new Product { Id = promotionItemDTO.ProductId };
-                    products.Add(product);
-                    var promotionItem = new PromotionItem
-                    {
-                        Promotion = newPromotion,
-                        InPromotionProduct = product,
-                        NewPrice = promotionItemDTO.NewPrice
-                    };
-
-                    promotionItems.Add(promotionItem);
-                }
-
-                _context.AttachRange(products);
-                _context.PromotionItem.AddRange(promotionItems);
-                await _context.SaveChangesAsync();
-
-                return CreatedAtAction("GetPromotion", new { id = newPromotion.Id }, newPromotion);
+                return Unauthorized();
             }
 
-            return BadRequest();
+            var productIdList = promotion.PromotionItems.Select(p => p.ProductId);
+
+            if (await ProductPromotionIsActive(productIdList)) return BadRequest();
+
+            Promotion newPromotion = promotion;
+            _context.Promotion.Add(newPromotion);
+            var promotionItems = new List<PromotionItem>();
+            var products = new List<Product>();
+            foreach (PromotionItemsDTO promotionItemDTO in promotion.PromotionItems)
+            {
+                var product = new Product { Id = promotionItemDTO.ProductId };
+                products.Add(product);
+                var promotionItem = new PromotionItem
+                {
+                    Promotion = newPromotion,
+                    InPromotionProduct = product,
+                    NewPrice = promotionItemDTO.NewPrice
+                };
+
+                promotionItems.Add(promotionItem);
+            }
+
+            _context.AttachRange(products);
+            _context.PromotionItem.AddRange(promotionItems);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetPromotion", new { id = newPromotion.Id }, newPromotion);
+
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<Promotion>> PutPromotion(int id, PromotionFormDTO promotion)
+        {
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            if (tokenId != 1)
+            {
+                return Unauthorized();
+            }
+
+            var productIdList = promotion.PromotionItems.Select(p => p.ProductId);
+
+            if (await ProductPromotionIsActive(productIdList, id)) return BadRequest();
+
+            var newPromotion = await _context.Promotion.Include(p => p.PromotionItems).FirstOrDefaultAsync(p => p.Id == id && !p.Archived);
+
+            if (newPromotion == null)
+            {
+                return NotFound();
+            }
+
+            _context.Promotion.Attach(newPromotion);
+
+            var promotionItems = new List<PromotionItem>();
+            var products = new List<Product>();
+            foreach (PromotionItemsDTO promotionItemDTO in promotion.PromotionItems)
+            {
+                var product = new Product { Id = promotionItemDTO.ProductId };
+                products.Add(product);
+                var promotionItem = new PromotionItem
+                {
+                    Promotion = newPromotion,
+                    InPromotionProduct = product,
+                    NewPrice = promotionItemDTO.NewPrice
+                };
+
+                promotionItems.Add(promotionItem);
+            }
+
+            _context.AttachRange(products);
+
+            newPromotion.Name = promotion.Name;
+            newPromotion.Description = promotion.Description;
+            newPromotion.IsBroadcasted = promotion.IsBroadcasted;
+            newPromotion.PromotionItems = promotionItems;
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Promotion>> ArchivePromotion(int id)
+        {
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            if (tokenId != 1)
+            {
+                return Unauthorized();
+            }
+
+            var promotion = await _context.Promotion.FirstOrDefaultAsync(p => p.Id == id);
+
+            if (promotion == null)
+            {
+                return NotFound();
+            }
+
+            promotion.IsBroadcasted = false;
+            promotion.Archived = true;
+
+            await _context.SaveChangesAsync();
+
+            return promotion;
         }
 
         private Task<bool> ProductPromotionIsActive(IEnumerable<int> productId)
         {
             return _context.PromotionItem
-                .AnyAsync(pi => pi.Promotion.IsBroadcasted && productId.Contains(pi.InPromotionProduct.Id));
+                .AnyAsync(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived && productId.Contains(pi.InPromotionProduct.Id));
+        }
+
+        private Task<bool> ProductPromotionIsActive(IEnumerable<int> productId, int promotionId)
+        {
+            return _context.PromotionItem
+                .AnyAsync(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived && pi.Promotion.Id != promotionId && productId.Contains(pi.InPromotionProduct.Id));
         }
 
         private Task<bool> PromotionExists(int id)

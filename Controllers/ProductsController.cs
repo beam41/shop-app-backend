@@ -375,11 +375,14 @@ namespace ShopAppBackend.Controllers
             }
 
             var product = await _context.Product.Include(p => p.ProductImages).FirstOrDefaultAsync(p => p.Id == id);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
             product.IsVisible = false;
             product.Archived = true;
-
-
-
 
             foreach (var productImage in product.ProductImages)
             {

@@ -14,6 +14,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ShopAppBackend.Enums;
 
 namespace ShopAppBackend.Controllers
 {
@@ -42,9 +43,24 @@ namespace ShopAppBackend.Controllers
 
         // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        public async Task<ActionResult<UserFormDTO>> GetUser(int id)
         {
-            var user = await _context.User.FindAsync(id);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            if (tokenId != 1) return BadRequest();
+
+            var user = await _context.User.Select(u => new UserFormDTO
+            {
+                Id = u.Id,
+                Username = u.Username,
+                PhoneNumber = u.PhoneNumber,
+                FullName = u.FullName,
+                Address = u.Address,
+                Province = u.Province,
+                District = u.District,
+                SubDistrict = u.SubDistrict,
+                PostalCode = u.PostalCode,
+            }).FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null)
             {
@@ -52,6 +68,23 @@ namespace ShopAppBackend.Controllers
             }
 
             return user;
+        }
+
+        [HttpGet("list")]
+        public async Task<ActionResult<IEnumerable<UserListDTO>>> GetUserList()
+        {
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            if (tokenId != 1) return BadRequest();
+
+            return await _context.User.Select(u => new UserListDTO
+            {
+                Id = u.Id,
+                Username = u.Username,
+                FullName = u.FullName,
+                PhoneNumber = u.PhoneNumber,
+                ActiveOrders = u.Orders.Count(o => o.OrderStates.All(os => os.State != OrderStateEnum.Received))
+            }).ToListAsync();
         }
 
         [AllowAnonymous]
@@ -102,30 +135,37 @@ namespace ShopAppBackend.Controllers
 
             _authService.GenToken(user);
 
-            return Ok(user);
+            return user;
         }
 
 
         [HttpPut("{id}")]
         public async Task<IActionResult> EditUser(int id, UserEditDTO userInfo)
-        { 
+        {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
-            if (id != tokenId)
-            {
-                return BadRequest();
-            }
+            if (tokenId != 1 && id != tokenId) return BadRequest();
 
             User user;
             if (userInfo.NewPassword?.Length > 0)
             {
-                var passwordHash = _authService.HashPassword(userInfo.Password);
+                if (tokenId != 1)
+                {
+                    var passwordHash = _authService.HashPassword(userInfo.Password);
 
-                user = await _context.User
-                    .FirstOrDefaultAsync(u =>
-                        u.Id == id &&
-                        u.Password == passwordHash
-                    );
+                    user = await _context.User
+                        .FirstOrDefaultAsync(u =>
+                            u.Id == id &&
+                            u.Password == passwordHash
+                        );
+                }
+                else
+                {
+                    user = await _context.User
+                        .FirstOrDefaultAsync(u =>
+                            u.Id == id
+                        );
+                }
 
                 if (user == null)
                 {

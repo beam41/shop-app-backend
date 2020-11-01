@@ -99,10 +99,10 @@ namespace ShopAppBackend.Models
 
     public class UserEditDTO
     {
-        [StringLength(44, MinimumLength = 6)]
+        [MinLength(6)]
         public string Password { get; set; }
 
-        [StringLength(44, MinimumLength = 6)]
+        [MinLength(6)]
         public string NewPassword { get; set; }
 
         public string PhoneNumber { get; set; }
@@ -118,6 +118,40 @@ namespace ShopAppBackend.Models
         public string SubDistrict { get; set; }
 
         [StringLength(5)]
+        public string PostalCode { get; set; }
+    }
+
+    public class UserListDTO
+    {
+        public int Id { get; set; }
+
+        public string Username { get; set; }
+
+        public string PhoneNumber { get; set; }
+
+        public string FullName { get; set; }
+
+        public int ActiveOrders { get; set; }
+    }
+
+    public class UserFormDTO
+    {
+        public int Id { get; set; }
+
+        public string Username { get; set; }
+
+        public string PhoneNumber { get; set; }
+
+        public string FullName { get; set; }
+
+        public string Address { get; set; }
+
+        public string Province { get; set; }
+
+        public string District { get; set; }
+
+        public string SubDistrict { get; set; }
+
         public string PostalCode { get; set; }
     }
 }

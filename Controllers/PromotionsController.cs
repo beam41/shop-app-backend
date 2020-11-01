@@ -115,7 +115,7 @@ namespace ShopAppBackend.Controllers
 
             var productIdList = promotion.PromotionItems.Select(p => p.ProductId);
 
-            if (await ProductPromotionIsActive(productIdList)) return BadRequest();
+            if (promotion.IsBroadcasted && await ProductPromotionIsActive(productIdList)) return BadRequest();
 
             Promotion newPromotion = promotion;
             _context.Promotion.Add(newPromotion);
@@ -155,7 +155,7 @@ namespace ShopAppBackend.Controllers
 
             var productIdList = promotion.PromotionItems.Select(p => p.ProductId);
 
-            if (await ProductPromotionIsActive(productIdList, id)) return BadRequest();
+            if (promotion.IsBroadcasted && await ProductPromotionIsActive(productIdList, id)) return BadRequest();
 
             var newPromotion = await _context.Promotion.Include(p => p.PromotionItems).FirstOrDefaultAsync(p => p.Id == id && !p.Archived);
 

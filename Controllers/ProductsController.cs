@@ -317,21 +317,23 @@ namespace ShopAppBackend.Controllers
                 return Unauthorized();
             }
 
+            var product = await _context.Product.Include(p => p.ProductImages).FirstOrDefaultAsync(p => p.Id == id && !p.Archived);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
             var type = new ProductType { Id = productEdit.TypeId };
             _context.Attach(type);
 
-            var product = new Product
-            {
-                Id = id,
-                Name = productEdit.Name,
-                Price = productEdit.Price,
-                Description = productEdit.Description,
-                Type = type,
-                IsVisible = productEdit.IsVisible
-            };
+            _context.Attach(product);
+            product.Name = productEdit.Name;
+            product.Price = productEdit.Price;
+            product.Description = productEdit.Description;
+            product.Type = type;
+            product.IsVisible = productEdit.IsVisible;
 
-            _context.Entry(product).State = EntityState.Modified;
-            
             IEnumerable<ProductImage> markForDelImages = new List<ProductImage>();
             if (productEdit.MarkForDeleteId != null)
             {

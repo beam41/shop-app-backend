@@ -164,7 +164,7 @@ namespace ShopAppBackend.Controllers
                 Description = promotion.Description,
                 IsBroadcasted = promotion.IsBroadcasted
             };
-            _context.Entry(newPromotion).State = EntityState.Modified;
+            
 
             var promotionItems = new List<PromotionItem>();
             var products = new List<Product>();
@@ -183,9 +183,9 @@ namespace ShopAppBackend.Controllers
             }
 
             _context.AttachRange(products);
-
             
             newPromotion.PromotionItems = promotionItems;
+            _context.Entry(newPromotion).State = EntityState.Modified;
 
             await _context.SaveChangesAsync();
 

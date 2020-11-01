@@ -157,14 +157,14 @@ namespace ShopAppBackend.Controllers
 
             if (promotion.IsBroadcasted && await ProductPromotionIsActive(productIdList, id)) return BadRequest();
 
-            var newPromotion = await _context.Promotion.Include(p => p.PromotionItems).FirstOrDefaultAsync(p => p.Id == id && !p.Archived);
-
-            if (newPromotion == null)
+            var newPromotion = new Promotion
             {
-                return NotFound();
-            }
-
-            _context.Promotion.Attach(newPromotion);
+                Id = id,
+                Name = promotion.Name,
+                Description = promotion.Description,
+                IsBroadcasted = promotion.IsBroadcasted
+            };
+            _context.Entry(newPromotion).State = EntityState.Modified;
 
             var promotionItems = new List<PromotionItem>();
             var products = new List<Product>();
@@ -184,9 +184,7 @@ namespace ShopAppBackend.Controllers
 
             _context.AttachRange(products);
 
-            newPromotion.Name = promotion.Name;
-            newPromotion.Description = promotion.Description;
-            newPromotion.IsBroadcasted = promotion.IsBroadcasted;
+            
             newPromotion.PromotionItems = promotionItems;
 
             await _context.SaveChangesAsync();

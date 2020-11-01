@@ -110,10 +110,8 @@ namespace ShopAppBackend.Controllers
                 return Unauthorized();
             }
 
-            var productTypeOld = new ProductType() { Id = id };
-            _context.Attach(productTypeOld);
-
-            productTypeOld.Name = productType.Name;
+            var productTypeOld = new ProductType { Id = id, Name = productType.Name };
+            _context.Entry(productTypeOld).State = EntityState.Modified;
 
             await _context.SaveChangesAsync();
 

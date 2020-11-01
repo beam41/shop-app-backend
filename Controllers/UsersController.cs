@@ -89,7 +89,7 @@ namespace ShopAppBackend.Controllers
 
         [AllowAnonymous]
         [HttpGet("check-exist")]
-        public async Task<ActionResult<UserLoginDTO>> CheckUserExist()
+        public async Task<ActionResult> CheckUserExist()
         {
             if (await UserExist(Request.Query["username"]))
             {

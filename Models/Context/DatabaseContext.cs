@@ -104,5 +104,7 @@ namespace ShopAppBackend.Models.Context
 
         public DbSet<OrderPromotion> OrderPromotion { get; set; }
 
+        public DbSet<PaymentMethod> PaymentMethod { get; set; }
+
     }
 }

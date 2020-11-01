@@ -164,7 +164,8 @@ namespace ShopAppBackend.Controllers
                 Description = promotion.Description,
                 IsBroadcasted = promotion.IsBroadcasted
             };
-            
+            _context.Entry(newPromotion).State = EntityState.Modified;
+            _context.PromotionItem.RemoveRange(_context.PromotionItem.Where(x => x.Promotion.Id == id));
 
             var promotionItems = new List<PromotionItem>();
             var products = new List<Product>();
@@ -185,7 +186,7 @@ namespace ShopAppBackend.Controllers
             _context.AttachRange(products);
             
             newPromotion.PromotionItems = promotionItems;
-            _context.Entry(newPromotion).State = EntityState.Modified;
+            
 
             await _context.SaveChangesAsync();
 
@@ -203,15 +204,8 @@ namespace ShopAppBackend.Controllers
                 return Unauthorized();
             }
 
-            var promotion = await _context.Promotion.FirstOrDefaultAsync(p => p.Id == id);
-
-            if (promotion == null)
-            {
-                return NotFound();
-            }
-
-            promotion.IsBroadcasted = false;
-            promotion.Archived = true;
+            var promotion = new Promotion { Id = id, IsBroadcasted = false, Archived = true };
+            _context.Entry(promotion).State = EntityState.Modified;
 
             await _context.SaveChangesAsync();
 

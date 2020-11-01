@@ -147,8 +147,6 @@ namespace ShopAppBackend.Controllers
                 }
             }
 
-            
-
             user.PhoneNumber = userInfo.PhoneNumber;
             user.FullName = userInfo.FullName;
             user.Address = userInfo.Address;
@@ -159,34 +157,30 @@ namespace ShopAppBackend.Controllers
 
             await _context.SaveChangesAsync();
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await UserExist(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
             return NoContent();
+        }
 
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<User>> DeleteUser(int id)
+        {
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            if (tokenId != 1)
+            {
+                return Unauthorized();
+            }
+
+            var user = new User { Id = id };
+            _context.Entry(user).State = EntityState.Deleted;
+
+            await _context.SaveChangesAsync();
+
+            return user;
         }
 
         private Task<bool> UserExist(string username)
         {
             return _context.User.AnyAsync(u => u.Username == username);
-        }
-
-        private Task<bool> UserExist(int id)
-        {
-            return _context.User.AnyAsync(u => u.Id == id);
         }
     }
 }

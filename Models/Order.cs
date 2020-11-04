@@ -52,6 +52,10 @@ namespace ShopAppBackend.Models
 
         public string CreatedByUserFullName { get; set; }
 
+        public DateTime CreatedDate { get; set; }
+
+        public DateTime UpdatedDate { get; set; }
+
         public PurchaseMethodEnum PurchaseMethod { get; set; }
 
         public int ProductsCount { get; set; }

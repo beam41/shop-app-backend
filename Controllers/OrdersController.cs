@@ -11,6 +11,7 @@ using ShopAppBackend.Enums;
 using ShopAppBackend.Models;
 using ShopAppBackend.Models.Context;
 using ShopAppBackend.Services;
+using ShopAppBackend.Util;
 
 namespace ShopAppBackend.Controllers
 {
@@ -46,7 +47,9 @@ namespace ShopAppBackend.Controllers
                 return Unauthorized();
             }
 
-            if (!Enum.TryParse(Request.Query["state"].ToString(), out OrderStateEnum state)) return BadRequest();
+            var stateString = CaseChanger.UnderscoreToPascal(Request.Query["state"]);
+
+            if (!Enum.TryParse(stateString, out OrderStateEnum state)) return BadRequest();
 
             return await _context.Order
                 .Where(o => o
@@ -62,7 +65,9 @@ namespace ShopAppBackend.Controllers
                     ProductsCount = o.OrderProducts.Count,
                     AmountCount = o.OrderProducts.Sum(op => op.Amount),
                     PurchaseMethod = o.PurchaseMethod,
-                    TotalPrice = o.OrderProducts.Sum(op => (op.SavedNewPrice ?? op.SavedPrice) * op.Amount)
+                    TotalPrice = o.OrderProducts.Sum(op => (op.SavedNewPrice ?? op.SavedPrice) * op.Amount),
+                    CreatedDate = o.OrderStates.Min(os => os.CreatedAt),
+                    UpdatedDate = o.OrderStates.Max(os => os.CreatedAt),
                 })
                 .ToListAsync();
         }

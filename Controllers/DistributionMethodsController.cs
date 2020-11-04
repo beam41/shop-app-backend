@@ -24,7 +24,7 @@ namespace ShopAppBackend.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<DistributionMethod>>> GetDistributionMethod()
         {
-            return await _context.DistributionMethod.ToListAsync();
+            return await _context.DistributionMethod.Where(d => !d.Archived).ToListAsync();
         }
 
         [HttpPut]

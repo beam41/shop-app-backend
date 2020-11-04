@@ -24,6 +24,8 @@ namespace ShopAppBackend.Models
         public ICollection<OrderPromotion> OrderPromotions { get; set; }
 
         public ICollection<OrderProduct> OrderProducts { get; set; }
+
+        public DistributionMethod DistributionMethod { get; set; }
     }
 
     public class OrderCreateDTO
@@ -33,6 +35,8 @@ namespace ShopAppBackend.Models
         public JObject AddressJson { get; set; }
 
         public PurchaseMethodEnum PurchaseMethod { get; set; }
+
+        public int DistributionMethodId { get; set; }
     }
 
     public class OrderViewDTO
@@ -44,6 +48,8 @@ namespace ShopAppBackend.Models
         public PurchaseMethodEnum PurchaseMethod { get; set; }
 
         public ICollection<OrderStateDTO> OrderStates { get; set; }
+
+        public DistributionMethod DistributionMethod { get; set; }
     }
 
     public class OrderListDTO
@@ -68,13 +74,6 @@ namespace ShopAppBackend.Models
     public class OrderAddProofOfPaymentFullDTO
     {
         public IFormFile Image { get; set; }
-    }
-
-    public class OrderSentDTO
-    {
-        public DistributionMethodEnum DistributionMethod { get; set; }
-
-        public string TrackingNumber { get; set; }
     }
 
     public class OrderReceivedDTO

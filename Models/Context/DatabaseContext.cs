@@ -82,6 +82,10 @@ namespace ShopAppBackend.Models.Context
             modelBuilder.Entity<OrderPromotion>()
                 .HasOne(op => op.Promotion)
                 .WithMany(p => p.OrderPromotions);
+
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.DistributionMethod)
+                .WithMany(d => d.Orders);
         }
 
         public DbSet<User> User { get; set; }
@@ -105,6 +109,8 @@ namespace ShopAppBackend.Models.Context
         public DbSet<OrderPromotion> OrderPromotion { get; set; }
 
         public DbSet<PaymentMethod> PaymentMethod { get; set; }
+
+        public DbSet<ShopAppBackend.Models.DistributionMethod> DistributionMethod { get; set; }
 
     }
 }

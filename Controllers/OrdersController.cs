@@ -65,7 +65,7 @@ namespace ShopAppBackend.Controllers
                     ProductsCount = o.OrderProducts.Count,
                     AmountCount = o.OrderProducts.Sum(op => op.Amount),
                     PurchaseMethod = o.PurchaseMethod,
-                    TotalPrice = o.OrderProducts.Sum(op => (op.SavedNewPrice ?? op.SavedPrice) * op.Amount),
+                    TotalPrice = o.OrderProducts.Sum(op => (op.SavedNewPrice ?? op.SavedPrice) * op.Amount) + o.DistributionMethod.Price,
                     CreatedDate = o.OrderStates.Min(os => os.CreatedAt),
                     UpdatedDate = o.OrderStates.Max(os => os.CreatedAt),
                 })
@@ -84,6 +84,7 @@ namespace ShopAppBackend.Controllers
                 {
                     Id = o.Id,
                     PurchaseMethod = o.PurchaseMethod,
+                    DistributionMethod = o.DistributionMethod,
                     OrderStates = (ICollection<OrderStateDTO>)o.OrderStates.Select(os => new OrderStateDTO
                     {
                         Id = os.Id,
@@ -117,6 +118,9 @@ namespace ShopAppBackend.Controllers
             var user = new User { Id = tokenId };
             _context.Attach(user);
 
+            var distributionMethod = new DistributionMethod {Id = order.DistributionMethodId};
+            _context.Attach(distributionMethod);
+
             var newOrder = new Order
             {
                 PurchaseMethod = order.PurchaseMethod,
@@ -124,7 +128,8 @@ namespace ShopAppBackend.Controllers
                 OrderStates = new List<OrderState>
                 {
                     new OrderState { State = OrderStateEnum.Created, StateDataJson = order.AddressJson }
-                }
+                },
+                DistributionMethod = distributionMethod
             };
 
             _context.Order.Add(newOrder);
@@ -245,7 +250,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}/sent")]
-        public async Task<ActionResult> Sent(int id, OrderSentDTO data)
+        public async Task<ActionResult> Sent(int id)
         {
             // verifying
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
@@ -274,7 +279,6 @@ namespace ShopAppBackend.Controllers
                 new OrderState
                 {
                     State = OrderStateEnum.Sent,
-                    StateDataJson = (JObject)JToken.FromObject(data)
                 }
             };
 

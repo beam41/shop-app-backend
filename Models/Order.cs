@@ -81,4 +81,9 @@ namespace ShopAppBackend.Models
     {
         public string Message { get; set; }
     }
+
+    public class OrderCancelledDTO
+    {
+        public string Reason { get; set; }
+    }
 }

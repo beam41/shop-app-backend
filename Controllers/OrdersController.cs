@@ -316,5 +316,43 @@ namespace ShopAppBackend.Controllers
             return NoContent();
         }
 
+        [HttpPut("{id}/cancelled")]
+        public async Task<ActionResult> Cancelled(int id, OrderCancelledDTO data)
+        {
+            // verifying
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            var order = await _context.Order.Where(o =>
+                o.Id == id &&
+                (tokenId == 1 || o.CreatedByUser.Id == tokenId &&
+                o.OrderStates
+                    .OrderByDescending(os => os.CreatedAt)
+                    .First()
+                    .State == OrderStateEnum.Created)
+            ).FirstOrDefaultAsync();
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            // updating
+            order.OrderStates = new List<OrderState>
+            {
+                new OrderState
+                {
+                    State = OrderStateEnum.Cancelled,
+                    StateDataJson = (JObject)JToken.FromObject(new
+                    {
+                        ByAdmin = tokenId == 1,
+                         data.Reason,
+                    })
+                }
+            };
+
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
     }
 }

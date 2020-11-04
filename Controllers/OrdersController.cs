@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using ShopAppBackend.Enums;
 using ShopAppBackend.Models;
 using ShopAppBackend.Models.Context;
+using ShopAppBackend.Services;
 
 namespace ShopAppBackend.Controllers
 {
@@ -19,9 +21,12 @@ namespace ShopAppBackend.Controllers
     {
         private readonly DatabaseContext _context;
 
-        public OrdersController(DatabaseContext context)
+        private readonly ImageService _imageService;
+
+        public OrdersController(DatabaseContext context, ImageService imageService)
         {
             _context = context;
+            _imageService = imageService;
         }
 
         // GET: api/Orders
@@ -31,12 +36,46 @@ namespace ShopAppBackend.Controllers
             return await _context.Order.ToListAsync();
         }
 
+        [HttpGet("list")]
+        public async Task<ActionResult<IEnumerable<OrderListDTO>>> GetOrderList()
+        {
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            if (tokenId != 1)
+            {
+                return Unauthorized();
+            }
+
+            if (!Enum.TryParse(Request.Query["state"].ToString(), out OrderStateEnum state)) return BadRequest();
+
+            return await _context.Order
+                .Where(o => o
+                    .OrderStates
+                    .OrderByDescending(os => os.CreatedAt)
+                    .First()
+                    .State == state
+                )
+                .Select(o => new OrderListDTO
+                {
+                    Id = o.Id,
+                    CreatedByUserFullName = o.CreatedByUser.FullName,
+                    ProductsCount = o.OrderProducts.Count,
+                    AmountCount = o.OrderProducts.Sum(op => op.Amount),
+                    PurchaseMethod = o.PurchaseMethod,
+                    TotalPrice = o.OrderProducts.Sum(op => (op.SavedNewPrice ?? op.SavedPrice) * op.Amount)
+                })
+                .ToListAsync();
+        }
+
         // GET: api/Orders/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ViewOrderDTO>> GetOrder(int id)
+        public async Task<ActionResult<OrderViewDTO>> GetOrder(int id)
         {
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
             var order = await _context.Order
-                .Select(o => new ViewOrderDTO
+                .Where(o => o.CreatedByUser.Id == tokenId)
+                .Select(o => new OrderViewDTO
                 {
                     Id = o.Id,
                     PurchaseMethod = o.PurchaseMethod,
@@ -66,7 +105,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPost("new")]
-        public async Task<ActionResult<Order>> CreateOrder(CreateOrderDTO order)
+        public async Task<ActionResult<Order>> CreateOrder(OrderCreateDTO order)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
@@ -125,6 +164,41 @@ namespace ShopAppBackend.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetOrder", new { id = newOrder.Id }, new { id = newOrder.Id });
+        }
+
+        [HttpPut("{id}/add-proof-full")]
+        public async Task<ActionResult> AddProofOfPaymentFull(int id, [FromForm] OrderAddProofOfPaymentFullDTO data)
+        {
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            var order = await _context.Order.Where(o => 
+                o.Id == id &&
+                o.CreatedByUser.Id == tokenId &&
+                o.OrderStates
+                    .OrderByDescending(os => os.CreatedAt)
+                    .First()
+                    .State == OrderStateEnum.Created
+                ).FirstOrDefaultAsync();
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            // upload
+            var fileName = await _imageService.Uploader(data.Image, false);
+
+            order.OrderStates = new List<OrderState>
+            {
+                new OrderState
+                {
+                    State = OrderStateEnum.AddedProofOfPaymentFull,
+                    StateDataJson = (JObject)JToken.FromObject(new { fileName })
+                }
+            };
+
+            await _context.SaveChangesAsync();
+            return NoContent();
         }
 
     }

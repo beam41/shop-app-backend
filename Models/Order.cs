@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using ShopAppBackend.Enums;
 
@@ -25,7 +26,7 @@ namespace ShopAppBackend.Models
         public ICollection<OrderProduct> OrderProducts { get; set; }
     }
 
-    public class CreateOrderDTO
+    public class OrderCreateDTO
     {
         public ICollection<OrderProductCreateDTO> Products { get; set; }
 
@@ -34,7 +35,7 @@ namespace ShopAppBackend.Models
         public PurchaseMethodEnum PurchaseMethod { get; set; }
     }
 
-    public class ViewOrderDTO
+    public class OrderViewDTO
     {
         public int Id { get; set; }
 
@@ -43,5 +44,25 @@ namespace ShopAppBackend.Models
         public PurchaseMethodEnum PurchaseMethod { get; set; }
 
         public ICollection<OrderStateDTO> OrderStates { get; set; }
+    }
+
+    public class OrderListDTO
+    {
+        public int Id { get; set; }
+
+        public string CreatedByUserFullName { get; set; }
+
+        public PurchaseMethodEnum PurchaseMethod { get; set; }
+
+        public int ProductsCount { get; set; }
+
+        public int AmountCount { get; set; }
+
+        public double TotalPrice { get; set; }
+    }
+
+    public class OrderAddProofOfPaymentFullDTO
+    {
+        public IFormFile Image { get; set; }
     }
 }

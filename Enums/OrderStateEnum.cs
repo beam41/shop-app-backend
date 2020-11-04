@@ -19,8 +19,6 @@ namespace ShopAppBackend.Enums
         [EnumMember(Value = "RECEIVED")]
         Received, // 5
 
-        [EnumMember(Value = "EDITED_ADDRESS")]
-        EditedAddress,
         [EnumMember(Value = "CANCELLED")]
         Cancelled,
         // for build order

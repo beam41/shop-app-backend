@@ -282,5 +282,39 @@ namespace ShopAppBackend.Controllers
             return NoContent();
         }
 
+        [HttpPut("{id}/received")]
+        public async Task<ActionResult> Received(int id, OrderReceivedDTO data)
+        {
+            // verifying
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            var order = await _context.Order.Where(o =>
+                o.Id == id &&
+                o.CreatedByUser.Id == tokenId &&
+                o.OrderStates
+                    .OrderByDescending(os => os.CreatedAt)
+                    .First()
+                    .State == OrderStateEnum.Sent
+            ).FirstOrDefaultAsync();
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            // updating
+            order.OrderStates = new List<OrderState>
+            {
+                new OrderState
+                {
+                    State = OrderStateEnum.Received,
+                    StateDataJson = (JObject)JToken.FromObject(data)
+                }
+            };
+
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
     }
 }

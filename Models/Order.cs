@@ -76,4 +76,9 @@ namespace ShopAppBackend.Models
 
         public string TrackingNumber { get; set; }
     }
+
+    public class OrderReceivedDTO
+    {
+        public string Message { get; set; }
+    }
 }

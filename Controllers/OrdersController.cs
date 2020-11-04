@@ -174,6 +174,7 @@ namespace ShopAppBackend.Controllers
         [HttpPut("{id}/add-proof-full")]
         public async Task<ActionResult> AddProofOfPaymentFull(int id, [FromForm] OrderAddProofOfPaymentFullDTO data)
         {
+            // verifying
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
             var order = await _context.Order.Where(o => 
@@ -190,7 +191,7 @@ namespace ShopAppBackend.Controllers
                 return NotFound();
             }
 
-            // upload
+            // updating
             var fileName = await _imageService.Uploader(data.Image, false);
 
             order.OrderStates = new List<OrderState>
@@ -209,6 +210,7 @@ namespace ShopAppBackend.Controllers
         [HttpPut("{id}/approve-proof-full")]
         public async Task<ActionResult> ApproveProofOfPaymentFull(int id)
         {
+            // verifying
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
             if (tokenId != 1)
@@ -229,11 +231,50 @@ namespace ShopAppBackend.Controllers
                 return NotFound();
             }
 
+            // updating
             order.OrderStates = new List<OrderState>
             {
                 new OrderState
                 {
                     State = OrderStateEnum.ApprovedProofOfPaymentFull,
+                }
+            };
+
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        [HttpPut("{id}/sent")]
+        public async Task<ActionResult> Sent(int id, OrderSentDTO data)
+        {
+            // verifying
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            if (tokenId != 1)
+            {
+                return Unauthorized();
+            }
+
+            var order = await _context.Order.Where(o =>
+                o.Id == id &&
+                o.OrderStates
+                    .OrderByDescending(os => os.CreatedAt)
+                    .First()
+                    .State == OrderStateEnum.ApprovedProofOfPaymentFull
+            ).FirstOrDefaultAsync();
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            // updating
+            order.OrderStates = new List<OrderState>
+            {
+                new OrderState
+                {
+                    State = OrderStateEnum.Sent,
+                    StateDataJson = (JObject)JToken.FromObject(data)
                 }
             };
 

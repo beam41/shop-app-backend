@@ -69,4 +69,11 @@ namespace ShopAppBackend.Models
     {
         public IFormFile Image { get; set; }
     }
+
+    public class OrderSentDTO
+    {
+        public DistributionMethodEnum DistributionMethod { get; set; }
+
+        public string TrackingNumber { get; set; }
+    }
 }

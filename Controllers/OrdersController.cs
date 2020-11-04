@@ -201,5 +201,40 @@ namespace ShopAppBackend.Controllers
             return NoContent();
         }
 
+        [HttpPut("{id}/approve-proof-full")]
+        public async Task<ActionResult> ApproveProofOfPaymentFull(int id)
+        {
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            if (tokenId != 1)
+            {
+                return Unauthorized();
+            }
+
+            var order = await _context.Order.Where(o =>
+                o.Id == id &&
+                o.OrderStates
+                    .OrderByDescending(os => os.CreatedAt)
+                    .First()
+                    .State == OrderStateEnum.AddedProofOfPaymentFull
+            ).FirstOrDefaultAsync();
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            order.OrderStates = new List<OrderState>
+            {
+                new OrderState
+                {
+                    State = OrderStateEnum.ApprovedProofOfPaymentFull,
+                }
+            };
+
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
     }
 }

@@ -52,19 +52,32 @@ namespace ShopAppBackend.Models
         public DistributionMethod DistributionMethod { get; set; }
     }
 
-    public class OrderListDTO
+    public class OrderListAdminDTO
     {
         public int Id { get; set; }
 
         public string CreatedByUserFullName { get; set; }
 
-        public DateTime CreatedDate { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
 
-        public DateTime UpdatedDate { get; set; }
+        public DateTimeOffset UpdatedDate { get; set; }
 
         public PurchaseMethodEnum PurchaseMethod { get; set; }
 
         public int ProductsCount { get; set; }
+
+        public int AmountCount { get; set; }
+
+        public double TotalPrice { get; set; }
+    }
+
+    public class OrderListDTO
+    {
+        public int Id { get; set; }
+
+        public DateTimeOffset UpdatedDate { get; set; }
+
+        public ICollection<string> ProductsName { get; set; }
 
         public int AmountCount { get; set; }
 

@@ -37,8 +37,8 @@ namespace ShopAppBackend.Controllers
             return await _context.Order.ToListAsync();
         }
 
-        [HttpGet("list")]
-        public async Task<ActionResult<IEnumerable<OrderListDTO>>> GetOrderList()
+        [HttpGet("list/admin/{state}")]
+        public async Task<ActionResult<IEnumerable<OrderListAdminDTO>>> GetOrderList(string state)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
@@ -47,18 +47,18 @@ namespace ShopAppBackend.Controllers
                 return Unauthorized();
             }
 
-            var stateString = CaseChanger.UnderscoreToPascal(Request.Query["state"]);
+            var stateString = CaseChanger.UnderscoreToPascal(state);
 
-            if (!Enum.TryParse(stateString, out OrderStateEnum state)) return BadRequest();
+            if (!Enum.TryParse(stateString, out OrderStateEnum stateEnum)) return BadRequest();
 
             return await _context.Order
                 .Where(o => o
                     .OrderStates
                     .OrderByDescending(os => os.CreatedAt)
                     .First()
-                    .State == state
+                    .State == stateEnum
                 )
-                .Select(o => new OrderListDTO
+                .Select(o => new OrderListAdminDTO
                 {
                     Id = o.Id,
                     CreatedByUserFullName = o.CreatedByUser.FullName,
@@ -67,6 +67,24 @@ namespace ShopAppBackend.Controllers
                     PurchaseMethod = o.PurchaseMethod,
                     TotalPrice = o.OrderProducts.Sum(op => (op.SavedNewPrice ?? op.SavedPrice) * op.Amount) + o.DistributionMethod.Price,
                     CreatedDate = o.OrderStates.Min(os => os.CreatedAt),
+                    UpdatedDate = o.OrderStates.Max(os => os.CreatedAt),
+                })
+                .ToListAsync();
+        }
+
+        [HttpGet("list")]
+        public async Task<ActionResult<IEnumerable<OrderListDTO>>> GetOrderList()
+        {
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            return await _context.Order
+                .Where(o => o.CreatedByUser.Id == tokenId)
+                .Select(o => new OrderListDTO
+                {
+                    Id = o.Id,
+                    ProductsName = (ICollection<string>) o.OrderProducts.Select(op => op.Product.Name),
+                    AmountCount = o.OrderProducts.Sum(op => op.Amount),
+                    TotalPrice = o.OrderProducts.Sum(op => (op.SavedNewPrice ?? op.SavedPrice) * op.Amount) + o.DistributionMethod.Price,
                     UpdatedDate = o.OrderStates.Max(os => os.CreatedAt),
                 })
                 .ToListAsync();

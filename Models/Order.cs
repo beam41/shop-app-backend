@@ -43,7 +43,7 @@ namespace ShopAppBackend.Models
     {
         public int Id { get; set; }
 
-        public ICollection<ProductDetailDTO> Products { get; set; }
+        public ICollection<ProductOrderDetailDTO> Products { get; set; }
 
         public PurchaseMethodEnum PurchaseMethod { get; set; }
 

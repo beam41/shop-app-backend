@@ -129,6 +129,10 @@ namespace ShopAppBackend.Controllers
                 return NotFound();
             }
 
+            var addProof = order.OrderStates.First(os => os.State == OrderStateEnum.AddedProofOfPaymentFull);
+            addProof.StateDataJson = (JObject) JToken.FromObject(new
+                { fileName = _imageService.GetImageUrl(addProof.StateDataJson.Value<string>("fileName")) });
+
             return order;
         }
 

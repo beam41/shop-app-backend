@@ -112,13 +112,14 @@ namespace ShopAppBackend.Controllers
                         CreatedAt = os.CreatedAt,
                         State = os.State,
                         StateDataJson = os.StateDataJson,
-                    }),
-                    Products = (ICollection<ProductDetailDTO>)o.OrderProducts.Select(op => new ProductDetailDTO
+                    }).OrderBy(os => os.CreatedAt),
+                    Products = (ICollection<ProductDetailDTO>)o.OrderProducts.Select(op => new ProductOrderDetailDTO
                     {
                         Id = op.Product.Id,
                         Name = op.Product.Name,
                         Price = op.SavedPrice,
-                        NewPrice = op.SavedNewPrice
+                        NewPrice = op.SavedNewPrice,
+                        Amount = op.Amount
                     })
                 })
                 .FirstOrDefaultAsync(o => o.Id == id);

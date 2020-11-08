@@ -84,6 +84,8 @@ namespace ShopAppBackend.Models
         public double TotalPrice { get; set; }
 
         public OrderStateEnum State { get; set; }
+
+        public PurchaseMethodEnum PurchaseMethod { get; set; }
     }
 
     public class OrderAddProofOfPaymentFullDTO

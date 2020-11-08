@@ -86,7 +86,8 @@ namespace ShopAppBackend.Controllers
                     AmountCount = o.OrderProducts.Sum(op => op.Amount),
                     TotalPrice = o.OrderProducts.Sum(op => (op.SavedNewPrice ?? op.SavedPrice) * op.Amount) + o.DistributionMethod.Price,
                     UpdatedDate = o.OrderStates.Max(os => os.CreatedAt),
-                    State = o.OrderStates.OrderByDescending(os => os.CreatedAt).First().State
+                    State = o.OrderStates.OrderByDescending(os => os.CreatedAt).First().State,
+                    PurchaseMethod = o.PurchaseMethod
                 })
                 .OrderByDescending(os => os.UpdatedDate)
                 .ToListAsync();

@@ -129,7 +129,7 @@ namespace ShopAppBackend.Controllers
                 return NotFound();
             }
 
-            var addProof = order.OrderStates.First(os => os.State == OrderStateEnum.AddedProofOfPaymentFull);
+            var addProof = order.OrderStates.FirstOrDefault(os => os.State == OrderStateEnum.AddedProofOfPaymentFull);
 
             if (addProof != null)
             {

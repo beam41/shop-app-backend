@@ -93,6 +93,11 @@ namespace ShopAppBackend.Models
         public IFormFile Image { get; set; }
     }
 
+    public class OrderSentDTO
+    {
+        public string TrackingNumber { get; set; }
+    }
+
     public class OrderReceivedDTO
     {
         public string Message { get; set; }

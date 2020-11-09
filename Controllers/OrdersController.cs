@@ -282,7 +282,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}/sent")]
-        public async Task<ActionResult> Sent(int id)
+        public async Task<ActionResult> Sent(int id, OrderSentDTO data)
         {
             // verifying
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
@@ -311,6 +311,7 @@ namespace ShopAppBackend.Controllers
                 new OrderState
                 {
                     State = OrderStateEnum.Sent,
+                    StateDataJson = (JObject)JToken.FromObject(new {trackingNumber = data.TrackingNumber})
                 }
             };
 
@@ -344,7 +345,7 @@ namespace ShopAppBackend.Controllers
                 new OrderState
                 {
                     State = OrderStateEnum.Received,
-                    StateDataJson = (JObject)JToken.FromObject(data)
+                    StateDataJson = (JObject)JToken.FromObject(new {message = data.Message})
                 }
             };
 
@@ -380,8 +381,8 @@ namespace ShopAppBackend.Controllers
                     State = OrderStateEnum.Cancelled,
                     StateDataJson = (JObject)JToken.FromObject(new
                     {
-                        ByAdmin = tokenId == 1,
-                         data.Reason,
+                        byAdmin = tokenId == 1,
+                        reason = data.Reason,
                     })
                 }
             };

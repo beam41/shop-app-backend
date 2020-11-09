@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using ShopAppBackend.Models;
 
 namespace ShopAppBackend.Models.Context
@@ -15,6 +16,9 @@ namespace ShopAppBackend.Models.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            var serializer = new JsonSerializerSettings()
+                { ContractResolver = new CamelCasePropertyNamesContractResolver() };
+
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Username)
                 .IsUnique();
@@ -33,8 +37,8 @@ namespace ShopAppBackend.Models.Context
 
             modelBuilder.Entity<OrderState>()
                 .Property(e => e.StateDataJson).HasConversion(
-                os => JsonConvert.SerializeObject(os),
-                os => JsonConvert.DeserializeObject<JObject>(os));
+                os => JsonConvert.SerializeObject(os, serializer),
+                os => JsonConvert.DeserializeObject<JObject>(os, serializer));
 
             // product(M) and its Type(1)
             modelBuilder.Entity<Product>()

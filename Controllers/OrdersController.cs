@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using ShopAppBackend.Enums;
 using ShopAppBackend.Models;
 using ShopAppBackend.Models.Context;
@@ -135,6 +137,23 @@ namespace ShopAppBackend.Controllers
             {
                 addProof.StateDataJson = (JObject)JToken.FromObject(new
                 { fileName = _imageService.GetImageUrl(addProof.StateDataJson.Value<string>("fileName")) });
+            }
+
+            var sent = order.OrderStates.FirstOrDefault(os => os.State == OrderStateEnum.Sent);
+
+            if (sent != null)
+            {
+                var disMethod =
+                    await _context.DistributionMethod.FindAsync(sent.StateDataJson.Value<int>("distributionMethod"));
+                sent.StateDataJson = (JObject)JToken.FromObject(new
+                {
+                    distributionMethod = new { disMethod.Id, disMethod.Name },
+                    trackingNumber = sent.StateDataJson.Value<string>("trackingNumber")
+                }, 
+                JsonSerializer.Create(new JsonSerializerSettings
+                {
+                    ContractResolver = new CamelCasePropertyNamesContractResolver() 
+                }));
             }
 
             return order;

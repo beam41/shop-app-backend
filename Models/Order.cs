@@ -26,13 +26,58 @@ namespace ShopAppBackend.Models
         public ICollection<OrderProduct> OrderProducts { get; set; }
 
         public DistributionMethod DistributionMethod { get; set; }
+
+        public string TrackingNumber { get; set; }
+
+        [Column(TypeName = "char(10)")]
+        [StringLength(10)]
+        public string PhoneNumber { get; set; }
+
+        public string FullName { get; set; }
+
+        public string Address { get; set; }
+
+        [Column(TypeName = "nvarchar(32)")]
+        public string Province { get; set; }
+
+        [Column(TypeName = "nvarchar(32)")]
+        public string District { get; set; }
+
+        [Column(TypeName = "nvarchar(32)")]
+        public string SubDistrict { get; set; }
+
+        [Column(TypeName = "char(5)")]
+        [StringLength(5)]
+        public string PostalCode { get; set; }
+
+        public string ProofOfPaymentFullImage { get; set; }
+
+        public string ReceivedMessage { get; set; }
+
+        public bool CancelledByAdmin { get; set; }
+
+        public string CancelledReason { get; set; }
     }
 
     public class OrderCreateDTO
     {
         public ICollection<OrderProductCreateDTO> Products { get; set; }
 
-        public JObject AddressJson { get; set; }
+        [StringLength(10)]
+        public string PhoneNumber { get; set; }
+
+        public string FullName { get; set; }
+
+        public string Address { get; set; }
+
+        public string Province { get; set; }
+
+        public string District { get; set; }
+
+        public string SubDistrict { get; set; }
+
+        [StringLength(5)]
+        public string PostalCode { get; set; }
 
         public PurchaseMethodEnum PurchaseMethod { get; set; }
 
@@ -50,6 +95,30 @@ namespace ShopAppBackend.Models
         public ICollection<OrderStateDTO> OrderStates { get; set; }
 
         public DistributionMethod DistributionMethod { get; set; }
+
+        public string TrackingNumber { get; set; }
+
+        public string PhoneNumber { get; set; }
+
+        public string FullName { get; set; }
+
+        public string Address { get; set; }
+
+        public string Province { get; set; }
+
+        public string District { get; set; }
+
+        public string SubDistrict { get; set; }
+
+        public string PostalCode { get; set; }
+
+        public string ProofOfPaymentFullImage { get; set; }
+
+        public string ReceivedMessage { get; set; }
+
+        public bool CancelledByAdmin { get; set; }
+
+        public string CancelledReason { get; set; }
     }
 
     public class OrderListAdminDTO

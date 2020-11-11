@@ -16,8 +16,6 @@ namespace ShopAppBackend.Models.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            var serializer = new JsonSerializerSettings()
-                { ContractResolver = new CamelCasePropertyNamesContractResolver() };
 
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Username)
@@ -34,11 +32,6 @@ namespace ShopAppBackend.Models.Context
             modelBuilder.Entity<ProductType>()
                 .Property(pt => pt.Archived)
                 .HasDefaultValue(false);
-
-            modelBuilder.Entity<OrderState>()
-                .Property(e => e.StateDataJson).HasConversion(
-                os => JsonConvert.SerializeObject(os, serializer),
-                os => JsonConvert.DeserializeObject<JObject>(os, serializer));
 
             // product(M) and its Type(1)
             modelBuilder.Entity<Product>()
@@ -114,7 +107,7 @@ namespace ShopAppBackend.Models.Context
 
         public DbSet<PaymentMethod> PaymentMethod { get; set; }
 
-        public DbSet<ShopAppBackend.Models.DistributionMethod> DistributionMethod { get; set; }
+        public DbSet<DistributionMethod> DistributionMethod { get; set; }
 
     }
 }

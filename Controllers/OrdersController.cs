@@ -113,7 +113,6 @@ namespace ShopAppBackend.Controllers
                         Id = os.Id,
                         CreatedAt = os.CreatedAt,
                         State = os.State,
-                        StateDataJson = os.StateDataJson,
                     }).OrderBy(os => os.CreatedAt),
                     Products = (ICollection<ProductOrderDetailDTO>)o.OrderProducts.Select(op => new ProductOrderDetailDTO
                     {
@@ -122,21 +121,25 @@ namespace ShopAppBackend.Controllers
                         Price = op.SavedPrice,
                         NewPrice = op.SavedNewPrice,
                         Amount = op.Amount
-                    })
+                    }),
+                    TrackingNumber = o.TrackingNumber,
+                    FullName = o.FullName,
+                    Address = o.Address,
+                    Province = o.Province,
+                    District = o.District,
+                    SubDistrict = o.SubDistrict,
+                    PostalCode = o.PostalCode,
+                    PhoneNumber = o.PhoneNumber,
+                    ProofOfPaymentFullImage = o.ProofOfPaymentFullImage.Length > 0 ? _imageService.GetImageUrl(o.ProofOfPaymentFullImage) : null,
+                    ReceivedMessage = o.ReceivedMessage,
+                    CancelledByAdmin = o.CancelledByAdmin,
+                    CancelledReason = o.CancelledReason
                 })
                 .FirstOrDefaultAsync(o => o.Id == id);
 
             if (order == null)
             {
                 return NotFound();
-            }
-
-            var addProof = order.OrderStates.FirstOrDefault(os => os.State == OrderStateEnum.AddedProofOfPaymentFull);
-
-            if (addProof != null)
-            {
-                addProof.StateDataJson = (JObject)JToken.FromObject(new
-                { fileName = _imageService.GetImageUrl(addProof.StateDataJson.Value<string>("fileName")) });
             }
 
             return order;
@@ -159,9 +162,16 @@ namespace ShopAppBackend.Controllers
                 CreatedByUser = user,
                 OrderStates = new List<OrderState>
                 {
-                    new OrderState { State = OrderStateEnum.Created, StateDataJson = order.AddressJson }
+                    new OrderState { State = OrderStateEnum.Created }
                 },
-                DistributionMethod = distributionMethod
+                DistributionMethod = distributionMethod,
+                FullName = order.FullName,
+                Address = order.Address,
+                Province = order.Province,
+                District = order.District,
+                SubDistrict = order.SubDistrict,
+                PostalCode = order.PostalCode,
+                PhoneNumber = order.PhoneNumber
             };
 
             _context.Order.Add(newOrder);
@@ -236,9 +246,10 @@ namespace ShopAppBackend.Controllers
                 new OrderState
                 {
                     State = OrderStateEnum.AddedProofOfPaymentFull,
-                    StateDataJson = (JObject)JToken.FromObject(new { fileName })
                 }
             };
+
+            order.ProofOfPaymentFullImage = fileName;
 
             await _context.SaveChangesAsync();
             return NoContent();
@@ -311,9 +322,10 @@ namespace ShopAppBackend.Controllers
                 new OrderState
                 {
                     State = OrderStateEnum.Sent,
-                    StateDataJson = (JObject)JToken.FromObject(new {trackingNumber = data.TrackingNumber})
                 }
             };
+
+            order.TrackingNumber = data.TrackingNumber;
 
             await _context.SaveChangesAsync();
             return NoContent();
@@ -345,9 +357,11 @@ namespace ShopAppBackend.Controllers
                 new OrderState
                 {
                     State = OrderStateEnum.Received,
-                    StateDataJson = (JObject)JToken.FromObject(new {message = data.Message})
                 }
             };
+
+            order.ReceivedMessage = data.Message;
+
 
             await _context.SaveChangesAsync();
             return NoContent();
@@ -379,13 +393,11 @@ namespace ShopAppBackend.Controllers
                 new OrderState
                 {
                     State = OrderStateEnum.Cancelled,
-                    StateDataJson = (JObject)JToken.FromObject(new
-                    {
-                        byAdmin = tokenId == 1,
-                        reason = data.Reason,
-                    })
                 }
             };
+
+            order.CancelledByAdmin = tokenId == 1;
+            order.CancelledReason = data.Reason;
 
             await _context.SaveChangesAsync();
             return NoContent();

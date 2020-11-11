@@ -18,8 +18,6 @@ namespace ShopAppBackend.Models
         public Order Order { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; }
-
-        public JObject StateDataJson { get; set; }
     }
 
     public class OrderStateDTO
@@ -29,7 +27,5 @@ namespace ShopAppBackend.Models
         public OrderStateEnum State { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; }
-
-        public JObject StateDataJson { get; set; }
     }
 }

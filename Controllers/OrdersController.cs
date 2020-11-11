@@ -308,7 +308,9 @@ namespace ShopAppBackend.Controllers
                 o.OrderStates
                     .OrderByDescending(os => os.CreatedAt)
                     .First()
-                    .State == OrderStateEnum.ApprovedProofOfPaymentFull
+                    .State == (o.PurchaseMethod == PurchaseMethodEnum.Bank 
+                        ? OrderStateEnum.ApprovedProofOfPaymentFull 
+                        : OrderStateEnum.Created)
             ).FirstOrDefaultAsync();
 
             if (order == null)

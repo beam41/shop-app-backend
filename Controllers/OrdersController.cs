@@ -102,7 +102,7 @@ namespace ShopAppBackend.Controllers
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
             var order = await _context.Order
-                .Where(o => o.CreatedByUser.Id == tokenId)
+                .Where(o => tokenId == 1 || o.CreatedByUser.Id == tokenId)
                 .Select(o => new OrderViewDTO
                 {
                     Id = o.Id,

@@ -63,7 +63,12 @@ namespace ShopAppBackend.Controllers
                 .Select(o => new OrderListAdminDTO
                 {
                     Id = o.Id,
-                    CreatedByUserFullName = o.CreatedByUser.FullName,
+                    CreatedBy = new User
+                    {
+                        Id = o.CreatedByUser.Id, 
+                        Username = o.CreatedByUser.Username, 
+                        FullName = o.CreatedByUser.FullName
+                    },
                     ProductsCount = o.OrderProducts.Count,
                     AmountCount = o.OrderProducts.Sum(op => op.Amount),
                     PurchaseMethod = o.PurchaseMethod,
@@ -133,7 +138,8 @@ namespace ShopAppBackend.Controllers
                     ProofOfPaymentFullImage = o.ProofOfPaymentFullImage.Length > 0 ? _imageService.GetImageUrl(o.ProofOfPaymentFullImage) : null,
                     ReceivedMessage = o.ReceivedMessage,
                     CancelledByAdmin = o.CancelledByAdmin,
-                    CancelledReason = o.CancelledReason
+                    CancelledReason = o.CancelledReason,
+                    CreatedBy = tokenId == 1 ? new User { Id = o.CreatedByUser.Id, Username = o.CreatedByUser.Username, FullName = o.CreatedByUser.FullName } : null
                 })
                 .FirstOrDefaultAsync(o => o.Id == id);
 

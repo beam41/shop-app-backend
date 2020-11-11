@@ -119,13 +119,15 @@ namespace ShopAppBackend.Models
         public bool? CancelledByAdmin { get; set; }
 
         public string CancelledReason { get; set; }
+
+        public User CreatedBy { get; set; }
     }
 
     public class OrderListAdminDTO
     {
         public int Id { get; set; }
 
-        public string CreatedByUserFullName { get; set; }
+        public User CreatedBy { get; set; }
 
         public DateTimeOffset CreatedDate { get; set; }
 

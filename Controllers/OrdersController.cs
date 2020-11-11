@@ -369,19 +369,52 @@ namespace ShopAppBackend.Controllers
             return NoContent();
         }
 
-        [HttpPut("{id}/cancelled")]
+        [HttpPut("{id}/cancelled/admin")]
         public async Task<ActionResult> Cancelled(int id, OrderCancelledDTO data)
+        {
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            if (tokenId != 1)
+            {
+                return Unauthorized();
+            }
+
+            var order = await _context.Order.Where(o => o.Id == id).FirstOrDefaultAsync();
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            // updating
+            order.OrderStates = new List<OrderState>
+            {
+                new OrderState
+                {
+                    State = OrderStateEnum.Cancelled,
+                }
+            };
+
+            order.CancelledByAdmin = true;
+            order.CancelledReason = data.Reason;
+
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        [HttpPut("{id}/cancelled/user")]
+        public async Task<ActionResult> Cancelled(int id)
         {
             // verifying
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
             var order = await _context.Order.Where(o =>
                 o.Id == id &&
-                (tokenId == 1 || o.CreatedByUser.Id == tokenId &&
+                o.CreatedByUser.Id == tokenId &&
                 o.OrderStates
                     .OrderByDescending(os => os.CreatedAt)
                     .First()
-                    .State == OrderStateEnum.Created)
+                    .State == OrderStateEnum.Created
             ).FirstOrDefaultAsync();
 
             if (order == null)
@@ -398,8 +431,7 @@ namespace ShopAppBackend.Controllers
                 }
             };
 
-            order.CancelledByAdmin = tokenId == 1;
-            order.CancelledReason = data.Reason;
+            order.CancelledByAdmin = false;
 
             await _context.SaveChangesAsync();
             return NoContent();

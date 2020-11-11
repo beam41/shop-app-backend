@@ -54,7 +54,7 @@ namespace ShopAppBackend.Models
 
         public string ReceivedMessage { get; set; }
 
-        public bool CancelledByAdmin { get; set; }
+        public bool? CancelledByAdmin { get; set; }
 
         public string CancelledReason { get; set; }
     }
@@ -116,7 +116,7 @@ namespace ShopAppBackend.Models
 
         public string ReceivedMessage { get; set; }
 
-        public bool CancelledByAdmin { get; set; }
+        public bool? CancelledByAdmin { get; set; }
 
         public string CancelledReason { get; set; }
     }

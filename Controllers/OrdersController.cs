@@ -63,7 +63,7 @@ namespace ShopAppBackend.Controllers
                 .Select(o => new OrderListAdminDTO
                 {
                     Id = o.Id,
-                    CreatedBy = new User
+                    CreatedByUser = new User
                     {
                         Id = o.CreatedByUser.Id, 
                         Username = o.CreatedByUser.Username, 
@@ -139,7 +139,7 @@ namespace ShopAppBackend.Controllers
                     ReceivedMessage = o.ReceivedMessage,
                     CancelledByAdmin = o.CancelledByAdmin,
                     CancelledReason = o.CancelledReason,
-                    CreatedBy = tokenId == 1 ? new User { Id = o.CreatedByUser.Id, Username = o.CreatedByUser.Username, FullName = o.CreatedByUser.FullName } : null
+                    CreatedByUser = tokenId == 1 ? new User { Id = o.CreatedByUser.Id, Username = o.CreatedByUser.Username, FullName = o.CreatedByUser.FullName } : null
                 })
                 .FirstOrDefaultAsync(o => o.Id == id);
 

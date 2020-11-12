@@ -120,14 +120,14 @@ namespace ShopAppBackend.Models
 
         public string CancelledReason { get; set; }
 
-        public User CreatedBy { get; set; }
+        public User CreatedByUser { get; set; }
     }
 
     public class OrderListAdminDTO
     {
         public int Id { get; set; }
 
-        public User CreatedBy { get; set; }
+        public User CreatedByUser { get; set; }
 
         public DateTimeOffset CreatedDate { get; set; }
 

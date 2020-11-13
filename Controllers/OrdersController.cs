@@ -205,19 +205,8 @@ namespace ShopAppBackend.Controllers
                 };
             });
 
-            // add promotion
-            var promotions = products
-                .Select(p =>  p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived)?.Promotion)
-                .Where(p => p != null)
-                .Distinct()
-                .ToList();
-
-            var orderPromotion = promotions.Select(p => new OrderPromotion{ Order = newOrder, Promotion = p });
-
             _context.AttachRange(products);
-            _context.AttachRange(promotions);
             _context.OrderProduct.AddRange(orderProducts);
-            _context.OrderPromotion.AddRange(orderPromotion);
 
             await _context.SaveChangesAsync();
 

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShopAppBackend.Models.Context;
 
 namespace ShopAppBackend.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20201113142507_RemoveOrderPromotion")]
+    partial class RemoveOrderPromotion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -158,7 +160,7 @@ namespace ShopAppBackend.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderState");
+                    b.ToTable("OrderStates");
                 });
 
             modelBuilder.Entity("ShopAppBackend.Models.PaymentMethod", b =>

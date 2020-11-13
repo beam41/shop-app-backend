@@ -71,15 +71,6 @@ namespace ShopAppBackend.Models.Context
                 .HasOne(op => op.Order)
                 .WithMany(p => p.OrderProducts);
 
-            // order(M) and promotion(M)
-            modelBuilder.Entity<OrderPromotion>()
-                .HasOne(op => op.Order)
-                .WithMany(o => o.OrderPromotions);
-
-            modelBuilder.Entity<OrderPromotion>()
-                .HasOne(op => op.Promotion)
-                .WithMany(p => p.OrderPromotions);
-
             modelBuilder.Entity<Order>()
                 .HasOne(o => o.DistributionMethod)
                 .WithMany(d => d.Orders);
@@ -91,19 +82,13 @@ namespace ShopAppBackend.Models.Context
 
         public DbSet<Product> Product { get; set; }
 
-        public DbSet<ProductImage> ProductImage { get; set; }
-
         public DbSet<Promotion> Promotion { get; set; }
 
         public DbSet<PromotionItem> PromotionItem { get; set; }
 
         public DbSet<Order> Order { get; set; }
 
-        public DbSet<OrderState> OrderStates { get; set; }
-
         public DbSet<OrderProduct> OrderProduct { get; set; }
-
-        public DbSet<OrderPromotion> OrderPromotion { get; set; }
 
         public DbSet<PaymentMethod> PaymentMethod { get; set; }
 

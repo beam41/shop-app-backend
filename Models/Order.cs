@@ -21,8 +21,6 @@ namespace ShopAppBackend.Models
 
         public ICollection<OrderState> OrderStates { get; set; }
 
-        public ICollection<OrderPromotion> OrderPromotions { get; set; }
-
         public ICollection<OrderProduct> OrderProducts { get; set; }
 
         public DistributionMethod DistributionMethod { get; set; }

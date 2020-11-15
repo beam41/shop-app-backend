@@ -16,5 +16,7 @@ namespace ShopAppBackend.Models
         public bool Archived { get; set; }
 
         public ICollection<Order> Orders { get; set; }
+
+        public ICollection<BuildOrder> BuildOrders { get; set; }
     }
 }

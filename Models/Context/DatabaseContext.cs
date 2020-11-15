@@ -74,6 +74,22 @@ namespace ShopAppBackend.Models.Context
             modelBuilder.Entity<Order>()
                 .HasOne(o => o.DistributionMethod)
                 .WithMany(d => d.Orders);
+
+            modelBuilder.Entity<BuildOrder>()
+                .HasOne(bo => bo.DistributionMethod)
+                .WithMany(d => d.BuildOrders);
+
+            modelBuilder.Entity<BuildOrder>()
+                .HasMany(bo => bo.OrderStates)
+                .WithOne(os => os.BuildOrder);
+
+            modelBuilder.Entity<BuildOrder>()
+                .HasMany(bo => bo.DescriptionImages)
+                .WithOne(oi => oi.BuildOrder);
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.BuildOrders)
+                .WithOne(bo => bo.CreatedByUser);
         }
 
         public DbSet<User> User { get; set; }
@@ -93,6 +109,8 @@ namespace ShopAppBackend.Models.Context
         public DbSet<PaymentMethod> PaymentMethod { get; set; }
 
         public DbSet<DistributionMethod> DistributionMethod { get; set; }
+
+        public DbSet<BuildOrder> BuildOrder { get; set; }
 
     }
 }

@@ -41,6 +41,8 @@ namespace ShopAppBackend.Models
         public string PostalCode { get; set; }
 
         public ICollection<Order> Orders { get; set; }
+
+        public ICollection<BuildOrder> BuildOrders { get; set; }
     }
 
     public class UserLoginDTO

@@ -24,6 +24,8 @@
     <Compile Remove="Migrations\20200915165635_AddOrder.Designer.cs" />
     <Compile Remove="Migrations\20201109064407_Serial.cs" />
     <Compile Remove="Migrations\20201109064407_Serial.Designer.cs" />
+    <Compile Remove="Migrations\20201115085254_BuildOrder.cs" />
+    <Compile Remove="Migrations\20201115085254_BuildOrder.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

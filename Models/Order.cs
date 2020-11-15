@@ -14,36 +14,48 @@ namespace ShopAppBackend.Models
     {
         public int Id { get; set; }
 
+        [Required]
         public User CreatedByUser { get; set; }
 
+        [Required]
         [Column(TypeName = "varchar(11)")]
         public PurchaseMethodEnum PurchaseMethod { get; set; }
 
+        [Required]
         public ICollection<OrderState> OrderStates { get; set; }
 
+        [Required]
         public ICollection<OrderProduct> OrderProducts { get; set; }
 
+        [Required]
         public DistributionMethod DistributionMethod { get; set; }
 
         public string TrackingNumber { get; set; }
 
+        [Required]
         [Column(TypeName = "char(10)")]
         [StringLength(10)]
         public string PhoneNumber { get; set; }
 
+        [Required]
         public string FullName { get; set; }
 
+        [Required]
         public string Address { get; set; }
 
+        [Required]
         [Column(TypeName = "nvarchar(32)")]
         public string Province { get; set; }
 
+        [Required]
         [Column(TypeName = "nvarchar(32)")]
         public string District { get; set; }
 
+        [Required]
         [Column(TypeName = "nvarchar(32)")]
         public string SubDistrict { get; set; }
 
+        [Required]
         [Column(TypeName = "char(5)")]
         [StringLength(5)]
         public string PostalCode { get; set; }

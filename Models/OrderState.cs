@@ -15,9 +15,11 @@ namespace ShopAppBackend.Models
         [Column(TypeName = "varchar(33)")]
         public OrderStateEnum State { get; set; }
 
+        public DateTimeOffset CreatedAt { get; set; }
+
         public Order Order { get; set; }
 
-        public DateTimeOffset CreatedAt { get; set; }
+        public BuildOrder BuildOrder { get; set; }
     }
 
     public class OrderStateDTO

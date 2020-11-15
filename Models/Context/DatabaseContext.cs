@@ -33,6 +33,14 @@ namespace ShopAppBackend.Models.Context
                 .Property(pt => pt.Archived)
                 .HasDefaultValue(false);
 
+            modelBuilder.Entity<DistributionMethod>()
+                .Property(dm => dm.Archived)
+                .HasDefaultValue(false);
+
+            modelBuilder.Entity<Promotion>()
+                .Property(p => p.Archived)
+                .HasDefaultValue(false);
+
             // product(M) and its Type(1)
             modelBuilder.Entity<Product>()
                 .HasOne(p => p.Type)

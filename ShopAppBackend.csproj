@@ -26,6 +26,8 @@
     <Compile Remove="Migrations\20201109064407_Serial.Designer.cs" />
     <Compile Remove="Migrations\20201115085254_BuildOrder.cs" />
     <Compile Remove="Migrations\20201115085254_BuildOrder.Designer.cs" />
+    <Compile Remove="Migrations\20201115090426_RemoveDefault.cs" />
+    <Compile Remove="Migrations\20201115090426_RemoveDefault.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

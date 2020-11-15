@@ -4,6 +4,8 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using ShopAppBackend.Enums;
 
 namespace ShopAppBackend.Models
 {
@@ -33,6 +35,12 @@ namespace ShopAppBackend.Models
         [StringLength(10)]
         public string PhoneNumber { get; set; }
 
+        [Column(TypeName = "char(10)")]
+        [StringLength(10)]
+        public string AddressPhoneNumber { get; set; }
+
+        public string AddressFullName { get; set; }
+
         public string Address { get; set; }
 
         [Column(TypeName = "nvarchar(32)")]
@@ -50,6 +58,8 @@ namespace ShopAppBackend.Models
 
         public string ProofOfPaymentFullImage { get; set; }
 
+        public string ProofOfPaymentDepositImage { get; set; }
+
         public string TrackingNumber { get; set; }
 
         public string ReceivedMessage { get; set; }
@@ -58,4 +68,60 @@ namespace ShopAppBackend.Models
 
         public string CancelledReason { get; set; }
     }
+
+    public class BuildOrderCreateDTO
+    {
+        [Required]
+        public string FullName { get; set; }
+
+        [Required]
+        public string OrderDescription { get; set; }
+
+        [Required]
+        public ICollection<IFormFile> DescriptionImages { get; set; }
+
+        [Required]
+        [StringLength(10)]
+        public string PhoneNumber { get; set; }
+    }
+
+    public class BuildOrderIsAbleToBuiltDTO
+    {
+        [Required]
+        public bool IsAbleToBuilt { get; set; }
+
+        public string RejectedReason { get; set; }
+    }
+
+    public class BuildOrderAddProofOfPaymentFullDTO
+    {
+        public IFormFile Image { get; set; }
+
+        [Required]
+        public string FullName { get; set; }
+
+        [Required]
+        public string Address { get; set; }
+
+        [Required]
+        public string Province { get; set; }
+
+        [Required]
+        public string District { get; set; }
+
+        [Required]
+        public string SubDistrict { get; set; }
+
+        [Required]
+        [StringLength(5)]
+        public string PostalCode { get; set; }
+
+        [Required]
+        [StringLength(10)]
+        public string PhoneNumber { get; set; }
+
+        [Required]
+        public int DistributionMethodId { get; set; }
+    }
+
 }

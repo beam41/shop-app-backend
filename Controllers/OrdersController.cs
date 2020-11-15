@@ -214,7 +214,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}/add-proof-full")]
-        public async Task<ActionResult> AddProofOfPaymentFull(int id, [FromForm] OrderAddProofOfPaymentFullDTO data)
+        public async Task<ActionResult> AddProofOfPaymentFull(int id, [FromForm] OrderAddProofOfPaymentDTO data)
         {
             // verifying
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);

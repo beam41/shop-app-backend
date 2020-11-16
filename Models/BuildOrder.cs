@@ -134,10 +134,20 @@ namespace ShopAppBackend.Models
         public int DistributionMethodId { get; set; }
     }
 
-    public class BuildOrderApprovedProofOfPaymentDeposit
+    public class BuildOrderApprovedProofOfPaymentDepositDTO
     {
         [Required]
         public DateTimeOffset ExpectedCompleteDate { get; set; }
     }
 
+    public class BuildOrderListDTO
+    {
+        public int Id { get; set; }
+
+        public DateTimeOffset UpdatedDate { get; set; }
+
+        public string OrderDescription { get; set; }
+
+        public OrderStateEnum State { get; set; }
+    }
 }

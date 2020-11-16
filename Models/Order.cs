@@ -170,8 +170,6 @@ namespace ShopAppBackend.Models
 
         public ICollection<string> ProductsName { get; set; }
 
-        public int AmountCount { get; set; }
-
         public double TotalPrice { get; set; }
 
         public OrderStateEnum State { get; set; }

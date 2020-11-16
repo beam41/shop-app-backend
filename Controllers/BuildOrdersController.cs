@@ -38,6 +38,24 @@ namespace ShopAppBackend.Controllers
                 .ToListAsync();
         }
 
+        [HttpGet("list")]
+        public async Task<ActionResult<IEnumerable<BuildOrderListDTO>>> GetBuildOrderList()
+        {
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            return await _context.BuildOrder
+                .Where(o => o.CreatedByUser.Id == tokenId)
+                .Select(o => new BuildOrderListDTO
+                {
+                    Id = o.Id,
+                    UpdatedDate = o.OrderStates.Max(os => os.CreatedAt),
+                    State = o.OrderStates.OrderByDescending(os => os.CreatedAt).First().State,
+                    OrderDescription = o.OrderDescription
+                })
+                .OrderByDescending(os => os.UpdatedDate)
+                .ToListAsync();
+        }
+
         // GET: api/BuildOrders/5
         [HttpGet("{id}")]
         public async Task<ActionResult<BuildOrder>> GetBuildOrder(int id)
@@ -175,7 +193,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}/approve-proof-deposit")]
-        public async Task<ActionResult> ApprovedProofOfPaymentDeposit(int id, BuildOrderApprovedProofOfPaymentDeposit data)
+        public async Task<ActionResult> ApprovedProofOfPaymentDeposit(int id, BuildOrderApprovedProofOfPaymentDepositDTO data)
         {
             // verifying
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);

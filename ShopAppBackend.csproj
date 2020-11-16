@@ -28,6 +28,8 @@
     <Compile Remove="Migrations\20201115085254_BuildOrder.Designer.cs" />
     <Compile Remove="Migrations\20201115090426_RemoveDefault.cs" />
     <Compile Remove="Migrations\20201115090426_RemoveDefault.Designer.cs" />
+    <Compile Remove="Migrations\20201116110539_NewField.cs" />
+    <Compile Remove="Migrations\20201116110539_NewField.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

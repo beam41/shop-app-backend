@@ -67,6 +67,12 @@ namespace ShopAppBackend.Models
         public bool? CancelledByAdmin { get; set; }
 
         public string CancelledReason { get; set; }
+
+        public double? DepositPrice { get; set; }
+
+        public double? FullPrice { get; set; }
+
+        public DateTimeOffset? ExpectedCompleteDate { get; set; }
     }
 
     public class BuildOrderCreateDTO
@@ -89,6 +95,10 @@ namespace ShopAppBackend.Models
     {
         [Required]
         public bool IsAbleToBuilt { get; set; }
+
+        public double DepositPrice { get; set; }
+
+        public double FullPrice { get; set; }
 
         public string RejectedReason { get; set; }
     }
@@ -122,6 +132,12 @@ namespace ShopAppBackend.Models
 
         [Required]
         public int DistributionMethodId { get; set; }
+    }
+
+    public class BuildOrderApprovedProofOfPaymentDeposit
+    {
+        [Required]
+        public DateTimeOffset ExpectedCompleteDate { get; set; }
     }
 
 }

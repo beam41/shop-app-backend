@@ -123,7 +123,12 @@ namespace ShopAppBackend.Controllers
                 }
             };
 
-            if (!data.IsAbleToBuilt)
+            if (data.IsAbleToBuilt)
+            {
+                buildOrder.DepositPrice = data.DepositPrice;
+                buildOrder.FullPrice = data.FullPrice;
+            }
+            else
             {
                 buildOrder.CancelledReason = data.RejectedReason;
             }
@@ -170,7 +175,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}/approve-proof-deposit")]
-        public async Task<ActionResult> ApprovedProofOfPaymentDeposit(int id)
+        public async Task<ActionResult> ApprovedProofOfPaymentDeposit(int id, BuildOrderApprovedProofOfPaymentDeposit data)
         {
             // verifying
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
@@ -201,6 +206,8 @@ namespace ShopAppBackend.Controllers
                     State = OrderStateEnum.ApprovedProofOfPaymentDeposit,
                 }
             };
+
+            buildOrder.ExpectedCompleteDate = data.ExpectedCompleteDate;
 
             await _context.SaveChangesAsync();
             return NoContent();

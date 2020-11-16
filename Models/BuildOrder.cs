@@ -83,7 +83,6 @@ namespace ShopAppBackend.Models
         [Required]
         public string OrderDescription { get; set; }
 
-        [Required]
         public ICollection<IFormFile> DescriptionImages { get; set; }
 
         [Required]

@@ -91,14 +91,17 @@ namespace ShopAppBackend.Controllers
                 DescriptionImages = new List<BuildOrderImage>()
             };
 
-            var fileNameList = buildOrder.DescriptionImages.Select(async p =>
+            if (buildOrder.DescriptionImages != null)
             {
-                var fileName = await _imageService.Uploader(p);
-                var pi = new BuildOrderImage { ImageFileName = fileName };
-                newBuildOrder.DescriptionImages.Add(pi);
-            }).ToArray();
+                var fileNameList = buildOrder.DescriptionImages.Select(async p =>
+                {
+                    var fileName = await _imageService.Uploader(p);
+                    var pi = new BuildOrderImage { ImageFileName = fileName };
+                    newBuildOrder.DescriptionImages.Add(pi);
+                }).ToArray();
 
-            Task.WaitAll(fileNameList);
+                Task.WaitAll(fileNameList);
+            }
 
             _context.BuildOrder.Add(newBuildOrder);
 

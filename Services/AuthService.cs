@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.IdentityModel.Tokens;
 using ShopAppBackend.Models.DTOs;
-using ShopAppBackend.Settings;
+using ShopAppBackend.Settings.Interfaces;
 
 namespace ShopAppBackend.Services
 {

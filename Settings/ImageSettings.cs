@@ -1,4 +1,6 @@
-﻿namespace ShopAppBackend.Settings.Interfaces
+﻿using ShopAppBackend.Settings.Interfaces;
+
+namespace ShopAppBackend.Settings
 {
     public class ImageSettings : IImageSettings
     {

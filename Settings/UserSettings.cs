@@ -1,4 +1,6 @@
-﻿namespace ShopAppBackend.Settings
+﻿using ShopAppBackend.Settings.Interfaces;
+
+namespace ShopAppBackend.Settings
 {
     public class UserSettings : IUserSettings
     {

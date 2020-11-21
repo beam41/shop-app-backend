@@ -87,7 +87,18 @@ namespace ShopAppBackend.Controllers
             _context.User.Add(user);
             await _context.SaveChangesAsync();
 
-            UserLoginDto newUser = user;
+            var newUser = new UserLoginDto
+            {
+                Id = user.Id,
+                Username = user.Username,
+                PhoneNumber = user.PhoneNumber,
+                FullName = user.FullName,
+                Address = user.Address,
+                Province = user.Province,
+                District = user.District,
+                SubDistrict = user.SubDistrict,
+                PostalCode = user.PostalCode
+            };
 
             _authService.GenToken(newUser);
 
@@ -100,11 +111,23 @@ namespace ShopAppBackend.Controllers
         {
             var passwordHash = _authService.HashPassword(userBody.Password);
 
-            UserLoginDto user = await _context.User
-                .FirstOrDefaultAsync(u =>
+            var user = await _context.User
+                .Where(u =>
                     u.Username == userBody.Username &&
                     u.Password == passwordHash
-                );
+                )
+                .Select(u => new UserLoginDto
+                {
+                    Id = u.Id,
+                    Username = u.Username,
+                    PhoneNumber = u.PhoneNumber,
+                    FullName = u.FullName,
+                    Address = u.Address,
+                    Province = u.Province,
+                    District = u.District,
+                    SubDistrict = u.SubDistrict,
+                    PostalCode = u.PostalCode
+                }).FirstOrDefaultAsync();
 
             // return null if user not found
             if (user == null) return Forbid();

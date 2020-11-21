@@ -25,17 +25,5 @@ namespace ShopAppBackend.Models.DTOs
 
         [Required]
         public ICollection<IFormFile> Images { get; set; }
-
-        public static implicit operator Product(ProductAddFormDto p)
-        {
-            return new Product
-            {
-                Id = p.Id,
-                Name = p.Name,
-                Price = p.Price,
-                Description = p.Description,
-                IsVisible = p.IsVisible
-            };
-        }
     }
 }

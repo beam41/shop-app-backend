@@ -174,7 +174,14 @@ namespace ShopAppBackend.Controllers
                         }),
                     Description = p.Description,
                     Promotion = p.PromotionItems
-                        .FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived).Promotion
+                        .Where(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived)
+                        .Select(pi => new PromotionInProductDetailDto
+                        {
+                            Id = pi.Promotion.Id,
+                            Description = pi.Promotion.Description,
+                            Name = pi.Promotion.Name
+                        })
+                        .FirstOrDefault()
                 })
                 .FirstOrDefaultAsync(i => i.Id == id);
 
@@ -273,10 +280,17 @@ namespace ShopAppBackend.Controllers
 
             var type = new ProductType { Id = productAdd.TypeId };
             _context.Attach(type);
-            Product newProduct = productAdd;
-            newProduct.Type = type;
+            var newProduct = new Product
+            {
+                Id = productAdd.Id,
+                Name = productAdd.Name,
+                Price = productAdd.Price,
+                Description = productAdd.Description,
+                IsVisible = productAdd.IsVisible,
+                Type = type,
+                ProductImages = new List<ProductImage>()
+            };
 
-            newProduct.ProductImages = new List<ProductImage>();
             var fileNameList = productAdd.Images.Select(async p =>
             {
                 var fileName = await _imageService.Uploader(p);

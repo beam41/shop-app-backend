@@ -26,17 +26,5 @@ namespace ShopAppBackend.Models.DTOs
         public ICollection<IFormFile> Images { get; set; }
 
         public ICollection<int> MarkForDeleteId { get; set; }
-
-        public static implicit operator Product(ProductEditFormDto p)
-        {
-            return new Product
-            {
-                Id = p.Id,
-                Name = p.Name,
-                Price = p.Price,
-                Description = p.Description,
-                IsVisible = p.IsVisible
-            };
-        }
     }
 }

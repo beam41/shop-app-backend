@@ -21,24 +21,5 @@
         public string PostalCode { get; set; }
 
         public string Token { get; set; }
-
-        public static implicit operator UserLoginDto(User u)
-        {
-            if (u != null)
-                return new UserLoginDto
-                {
-                    Id = u.Id,
-                    Username = u.Username,
-                    PhoneNumber = u.PhoneNumber,
-                    FullName = u.FullName,
-                    Address = u.Address,
-                    Province = u.Province,
-                    District = u.District,
-                    SubDistrict = u.SubDistrict,
-                    PostalCode = u.PostalCode
-                };
-
-            return null;
-        }
     }
 }

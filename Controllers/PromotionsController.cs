@@ -95,7 +95,13 @@ namespace ShopAppBackend.Controllers
 
             if (promotion.IsBroadcasted && await ProductPromotionIsActive(productIdList)) return BadRequest();
 
-            Promotion newPromotion = promotion;
+            var newPromotion = new Promotion
+            {
+                Name = promotion.Name,
+                Description = promotion.Description,
+                IsBroadcasted = promotion.IsBroadcasted
+            };
+
             _context.Promotion.Add(newPromotion);
             var promotionItems = new List<PromotionItem>();
             var products = new List<Product>();

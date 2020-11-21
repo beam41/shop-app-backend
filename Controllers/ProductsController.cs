@@ -28,17 +28,6 @@ namespace ShopAppBackend.Controllers
             _imageService = imageService;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProduct()
-        {
-            return await _context.Product
-                .Include(p => p.ProductImages)
-                .Include(p => p.Type)
-                .Include(p => p.PromotionItems)
-                .ThenInclude(pi => pi.Promotion)
-                .ToListAsync();
-        }
-
         [HttpGet("recommend")]
         [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<ProductDisplayDto>>> GetRecommend()

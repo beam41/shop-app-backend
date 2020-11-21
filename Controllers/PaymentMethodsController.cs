@@ -19,7 +19,6 @@ namespace ShopAppBackend.Controllers
             _context = context;
         }
 
-        // GET: api/PaymentMethods
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PaymentMethod>>> GetPaymentMethod()
         {

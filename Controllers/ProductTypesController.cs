@@ -22,7 +22,6 @@ namespace ShopAppBackend.Controllers
             _context = context;
         }
 
-        // GET: api/ProductTypes
         [HttpGet]
         [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<ProductType>>> GetProductType()
@@ -58,7 +57,6 @@ namespace ShopAppBackend.Controllers
                 }).ToListAsync();
         }
 
-        // GET: api/ProductTypes/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductTypeDetailDto>> GetProductType(int id)
         {
@@ -87,9 +85,6 @@ namespace ShopAppBackend.Controllers
             return productType;
         }
 
-        // PUT: api/ProductTypes/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
         public async Task<IActionResult> EditProductType(int id, ProductTypeInputDto productType)
         {
@@ -105,9 +100,6 @@ namespace ShopAppBackend.Controllers
             return NoContent();
         }
 
-        // POST: api/ProductTypes
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
         public async Task<ActionResult<ProductType>> AddProductType(ProductTypeInputDto productType)
         {
@@ -124,7 +116,6 @@ namespace ShopAppBackend.Controllers
             return CreatedAtAction("GetProductType", new { id = newProductType.Id }, productType);
         }
 
-        // DELETE: api/ProductTypes/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<ProductType>> ArchiveProductType(int id)
         {

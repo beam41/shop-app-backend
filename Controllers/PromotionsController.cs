@@ -20,12 +20,6 @@ namespace ShopAppBackend.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Promotion>>> GetPromotion()
-        {
-            return await _context.Promotion.Include(p => p.PromotionItems).ToListAsync();
-        }
-
         [HttpGet("list")]
         public async Task<ActionResult<IEnumerable<PromotionListDto>>> GetPromotionList()
         {
@@ -44,7 +38,6 @@ namespace ShopAppBackend.Controllers
                 }).ToListAsync();
         }
 
-        // GET: api/Promotions/5
         [HttpGet("{id}")]
         public async Task<ActionResult<PromotionDetailDto>> GetPromotion(int id)
         {
@@ -91,9 +84,6 @@ namespace ShopAppBackend.Controllers
             return promotion;
         }
 
-        // POST: api/Promotions
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
         public async Task<ActionResult<Promotion>> PostPromotion(PromotionFormDto promotion)
         {

@@ -27,15 +27,6 @@ namespace ShopAppBackend.Controllers
             _authService = authService;
         }
 
-        // GET: api/Users
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<ActionResult<IEnumerable<User>>> GetUser()
-        {
-            return await _context.User.ToListAsync();
-        }
-
-        // GET: api/Users/5
         [HttpGet("{id}")]
         public async Task<ActionResult<UserFormDto>> GetUser(int id)
         {

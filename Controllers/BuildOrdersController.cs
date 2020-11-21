@@ -26,17 +26,6 @@ namespace ShopAppBackend.Controllers
             _imageService = imageService;
         }
 
-        // GET: api/BuildOrders
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<BuildOrder>>> GetBuildOrder()
-        {
-            return await _context.BuildOrder
-                .Include(bo => bo.CreatedByUser)
-                .Include(bo => bo.DescriptionImages)
-                .Include(bo => bo.OrderStates)
-                .Include(bo => bo.DistributionMethod)
-                .ToListAsync();
-        }
 
         [HttpGet("list")]
         public async Task<ActionResult<IEnumerable<BuildOrderListDto>>> GetBuildOrderList()

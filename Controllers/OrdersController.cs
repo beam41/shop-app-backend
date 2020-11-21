@@ -29,13 +29,6 @@ namespace ShopAppBackend.Controllers
             _imageService = imageService;
         }
 
-        // GET: api/Orders
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrder()
-        {
-            return await _context.Order.ToListAsync();
-        }
-
         [HttpGet("list/admin/{state}")]
         public async Task<ActionResult<IEnumerable<OrderListAdminDto>>> GetOrderList(string state)
         {

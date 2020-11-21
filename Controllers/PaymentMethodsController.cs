@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShopAppBackend.Models;
@@ -31,12 +29,9 @@ namespace ShopAppBackend.Controllers
         [HttpPut]
         public async Task<ActionResult> UpdatePaymentMethod(IEnumerable<PaymentMethod> paymentMethod)
         {
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
-            if (tokenId != 1)
-            {
-                return Unauthorized();
-            }
+            if (tokenId != 1) return Unauthorized();
 
             await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE dbo.PaymentMethod");
             _context.PaymentMethod.AddRange(paymentMethod);

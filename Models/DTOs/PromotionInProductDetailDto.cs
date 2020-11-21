@@ -11,14 +11,13 @@
         public static implicit operator PromotionInProductDetailDto(Promotion p)
         {
             if (p != null)
-            {
                 return new PromotionInProductDetailDto
                 {
                     Id = p.Id,
                     Name = p.Name,
-                    Description = p.Description,
+                    Description = p.Description
                 };
-            }
+
             return null;
         }
     }

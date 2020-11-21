@@ -1,21 +1,14 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+using ShopAppBackend.Enums;
 using ShopAppBackend.Models;
 using ShopAppBackend.Models.Context;
-using ShopAppBackend.Services;
-using ShopAppBackend.Settings;
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ShopAppBackend.Enums;
 using ShopAppBackend.Models.DTOs;
+using ShopAppBackend.Services;
 
 namespace ShopAppBackend.Controllers
 {
@@ -24,9 +17,9 @@ namespace ShopAppBackend.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly DatabaseContext _context;
-
         private readonly AuthService _authService;
+
+        private readonly DatabaseContext _context;
 
         public UsersController(DatabaseContext context, AuthService authService)
         {
@@ -46,7 +39,7 @@ namespace ShopAppBackend.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<UserFormDto>> GetUser(int id)
         {
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
             if (tokenId != 1) return BadRequest();
 
@@ -60,13 +53,10 @@ namespace ShopAppBackend.Controllers
                 Province = u.Province,
                 District = u.District,
                 SubDistrict = u.SubDistrict,
-                PostalCode = u.PostalCode,
+                PostalCode = u.PostalCode
             }).FirstOrDefaultAsync(u => u.Id == id);
 
-            if (user == null)
-            {
-                return NotFound();
-            }
+            if (user == null) return NotFound();
 
             return user;
         }
@@ -74,7 +64,7 @@ namespace ShopAppBackend.Controllers
         [HttpGet("list")]
         public async Task<ActionResult<IEnumerable<UserListDto>>> GetUserList()
         {
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
             if (tokenId != 1) return BadRequest();
 
@@ -92,12 +82,9 @@ namespace ShopAppBackend.Controllers
         [HttpGet("check-exist")]
         public async Task<ActionResult> CheckUserExist()
         {
-            if (await UserExist(Request.Query["username"]))
-            {
-                return Ok(new {result = true});
-            }
+            if (await UserExist(Request.Query["username"])) return Ok(new { result = true });
 
-            return Ok(new {result = false});
+            return Ok(new { result = false });
         }
 
         [AllowAnonymous]
@@ -129,10 +116,7 @@ namespace ShopAppBackend.Controllers
                 );
 
             // return null if user not found
-            if (user == null)
-            {
-                return Forbid();
-            }
+            if (user == null) return Forbid();
 
             _authService.GenToken(user);
 
@@ -143,7 +127,7 @@ namespace ShopAppBackend.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> EditUser(int id, UserEditDto userInfo)
         {
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
             if (tokenId != 1 && id != tokenId) return BadRequest();
 
@@ -168,10 +152,7 @@ namespace ShopAppBackend.Controllers
                         );
                 }
 
-                if (user == null)
-                {
-                    return Forbid();
-                }
+                if (user == null) return Forbid();
 
                 user.Password = _authService.HashPassword(userInfo.NewPassword);
             }
@@ -182,10 +163,7 @@ namespace ShopAppBackend.Controllers
                         u.Id == id
                     );
 
-                if (user == null)
-                {
-                    return Forbid();
-                }
+                if (user == null) return Forbid();
             }
 
             user.PhoneNumber = userInfo.PhoneNumber;
@@ -204,12 +182,9 @@ namespace ShopAppBackend.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<User>> DeleteUser(int id)
         {
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
-            if (tokenId != 1)
-            {
-                return Unauthorized();
-            }
+            if (tokenId != 1) return Unauthorized();
 
             var user = new User { Id = id };
             _context.Entry(user).State = EntityState.Deleted;

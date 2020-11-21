@@ -1,15 +1,14 @@
-﻿using Azure.Storage.Blobs;
+﻿using System;
+using System.IO;
+using System.Threading.Tasks;
+using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Flurl;
 using Microsoft.AspNetCore.Http;
-using ShopAppBackend.Settings;
+using ShopAppBackend.Settings.Interfaces;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using System;
-using System.IO;
-using System.Threading.Tasks;
-using Flurl;
-using ShopAppBackend.Settings.Interfaces;
 
 namespace ShopAppBackend.Services
 {
@@ -29,20 +28,20 @@ namespace ShopAppBackend.Services
 
         public void DeleteFile(string fileName)
         {
-            BlobClient blobClient = new BlobClient(_imageSettings.ConnectionString, _imageSettings.ContainerName, fileName);
+            var blobClient = new BlobClient(_imageSettings.ConnectionString, _imageSettings.ContainerName, fileName);
             blobClient.DeleteIfExists();
         }
 
         public async Task<string> Uploader(IFormFile image, bool doCompress = true)
         {
-            var fileName = Guid.NewGuid().ToString() + ".jpg";
+            var fileName = Guid.NewGuid() + ".jpg";
 
-            BlobClient blobClient = new BlobClient(_imageSettings.ConnectionString, _imageSettings.ContainerName, fileName);
+            var blobClient = new BlobClient(_imageSettings.ConnectionString, _imageSettings.ContainerName, fileName);
 
-            await using MemoryStream imageStream = new MemoryStream();
+            await using var imageStream = new MemoryStream();
             await image.CopyToAsync(imageStream);
 
-            await using MemoryStream output = new MemoryStream();
+            await using var output = new MemoryStream();
             await ConvertImg(imageStream, output, doCompress);
 
             await blobClient.UploadAsync(output, new BlobUploadOptions
@@ -57,33 +56,26 @@ namespace ShopAppBackend.Services
         {
             input.Position = 0;
 
-            using Image<Rgba32> image = await Image.LoadAsync<Rgba32>(input);
+            using var image = await Image.LoadAsync<Rgba32>(input);
 
             if (doCompress)
             {
                 image.Metadata.ExifProfile = null;
 
-                double ratio = Convert.ToDouble(image.Width) / image.Height;
+                var ratio = Convert.ToDouble(image.Width) / image.Height;
 
                 if (image.Width >= image.Height && image.Width > _imageSettings.MaxWidth)
-                {
                     image.Mutate(x => x
-                        .Resize(_imageSettings.MaxWidth, (int)Math.Round(_imageSettings.MaxWidth / ratio))
+                        .Resize(_imageSettings.MaxWidth, (int) Math.Round(_imageSettings.MaxWidth / ratio))
                     );
-                }
                 else if (image.Width < image.Height && image.Height > _imageSettings.MaxWidth)
-                {
                     image.Mutate(x => x
-                        .Resize((int)Math.Round(_imageSettings.MaxWidth * ratio), _imageSettings.MaxWidth)
+                        .Resize((int) Math.Round(_imageSettings.MaxWidth * ratio), _imageSettings.MaxWidth)
                     );
-                }
             }
 
             await image.SaveAsJpegAsync(output);
             output.Position = 0;
-            return;
         }
     }
-
-
 }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace ShopAppBackend.Models
+﻿namespace ShopAppBackend.Models
 {
     public class PaymentMethod
     {

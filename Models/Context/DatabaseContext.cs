@@ -1,9 +1,4 @@
-﻿using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
-using ShopAppBackend.Models;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace ShopAppBackend.Models.Context
 {
@@ -14,9 +9,28 @@ namespace ShopAppBackend.Models.Context
             Database.EnsureCreated();
         }
 
+        public DbSet<User> User { get; set; }
+
+        public DbSet<ProductType> ProductType { get; set; }
+
+        public DbSet<Product> Product { get; set; }
+
+        public DbSet<Promotion> Promotion { get; set; }
+
+        public DbSet<PromotionItem> PromotionItem { get; set; }
+
+        public DbSet<Order> Order { get; set; }
+
+        public DbSet<OrderProduct> OrderProduct { get; set; }
+
+        public DbSet<PaymentMethod> PaymentMethod { get; set; }
+
+        public DbSet<DistributionMethod> DistributionMethod { get; set; }
+
+        public DbSet<BuildOrder> BuildOrder { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Username)
                 .IsUnique();
@@ -99,26 +113,5 @@ namespace ShopAppBackend.Models.Context
                 .HasMany(u => u.BuildOrders)
                 .WithOne(bo => bo.CreatedByUser);
         }
-
-        public DbSet<User> User { get; set; }
-
-        public DbSet<ProductType> ProductType { get; set; }
-
-        public DbSet<Product> Product { get; set; }
-
-        public DbSet<Promotion> Promotion { get; set; }
-
-        public DbSet<PromotionItem> PromotionItem { get; set; }
-
-        public DbSet<Order> Order { get; set; }
-
-        public DbSet<OrderProduct> OrderProduct { get; set; }
-
-        public DbSet<PaymentMethod> PaymentMethod { get; set; }
-
-        public DbSet<DistributionMethod> DistributionMethod { get; set; }
-
-        public DbSet<BuildOrder> BuildOrder { get; set; }
-
     }
 }

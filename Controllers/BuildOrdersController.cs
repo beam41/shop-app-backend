@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShopAppBackend.Enums;
@@ -42,7 +41,7 @@ namespace ShopAppBackend.Controllers
         [HttpGet("list")]
         public async Task<ActionResult<IEnumerable<BuildOrderListDto>>> GetBuildOrderList()
         {
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
             return await _context.BuildOrder
                 .Where(o => o.CreatedByUser.Id == tokenId)
@@ -61,7 +60,7 @@ namespace ShopAppBackend.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<BuildOrderViewDto>> GetBuildOrder(int id)
         {
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
             var buildOrder = await _context.BuildOrder
                 .Where(o => tokenId == 1 || o.CreatedByUser.Id == tokenId)
@@ -69,11 +68,11 @@ namespace ShopAppBackend.Controllers
                 {
                     Id = o.Id,
                     DistributionMethod = o.DistributionMethod,
-                    OrderStates = (ICollection<OrderStateDto>)o.OrderStates.Select(os => new OrderStateDto
+                    OrderStates = (ICollection<OrderStateDto>) o.OrderStates.Select(os => new OrderStateDto
                     {
                         Id = os.Id,
                         CreatedAt = os.CreatedAt,
-                        State = os.State,
+                        State = os.State
                     }).OrderBy(os => os.CreatedAt),
                     TrackingNumber = o.TrackingNumber,
                     FullName = o.FullName,
@@ -83,18 +82,28 @@ namespace ShopAppBackend.Controllers
                     SubDistrict = o.SubDistrict,
                     PostalCode = o.PostalCode,
                     PhoneNumber = o.PhoneNumber,
-                    ProofOfPaymentFullImage = o.ProofOfPaymentFullImage.Length > 0 ? _imageService.GetImageUrl(o.ProofOfPaymentFullImage) : null,
-                    ProofOfPaymentDepositImage = o.ProofOfPaymentDepositImage.Length > 0 ? _imageService.GetImageUrl(o.ProofOfPaymentDepositImage) : null,
+                    ProofOfPaymentFullImage = o.ProofOfPaymentFullImage.Length > 0
+                        ? _imageService.GetImageUrl(o.ProofOfPaymentFullImage)
+                        : null,
+                    ProofOfPaymentDepositImage = o.ProofOfPaymentDepositImage.Length > 0
+                        ? _imageService.GetImageUrl(o.ProofOfPaymentDepositImage)
+                        : null,
                     ReceivedMessage = o.ReceivedMessage,
                     CancelledByAdmin = o.CancelledByAdmin,
                     CancelledReason = o.CancelledReason,
-                    CreatedByUser = tokenId == 1 ? new User { Id = o.CreatedByUser.Id, Username = o.CreatedByUser.Username, FullName = o.CreatedByUser.FullName } : null,
+                    CreatedByUser = tokenId == 1
+                        ? new User
+                        {
+                            Id = o.CreatedByUser.Id, Username = o.CreatedByUser.Username,
+                            FullName = o.CreatedByUser.FullName
+                        }
+                        : null,
                     DepositPrice = o.DepositPrice,
                     FullPrice = o.FullPrice,
                     ExpectedCompleteDate = o.ExpectedCompleteDate,
                     AddressFullName = o.AddressFullName,
                     AddressPhoneNumber = o.AddressPhoneNumber,
-                    DescriptionImagesUrl = (ICollection<ImageUrlDto>) o.DescriptionImages.Select(im => new ImageUrlDto()
+                    DescriptionImagesUrl = (ICollection<ImageUrlDto>) o.DescriptionImages.Select(im => new ImageUrlDto
                     {
                         Id = im.Id,
                         ImageUrl = _imageService.GetImageUrl(im.ImageFileName)
@@ -103,10 +112,7 @@ namespace ShopAppBackend.Controllers
                 })
                 .FirstOrDefaultAsync(o => o.Id == id);
 
-            if (buildOrder == null)
-            {
-                return NotFound();
-            }
+            if (buildOrder == null) return NotFound();
 
             return buildOrder;
         }
@@ -117,7 +123,7 @@ namespace ShopAppBackend.Controllers
         [HttpPost]
         public async Task<ActionResult<BuildOrder>> PostBuildOrder([FromForm] BuildOrderCreateDto buildOrder)
         {
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
             var user = new User { Id = tokenId };
             _context.Attach(user);
@@ -156,12 +162,9 @@ namespace ShopAppBackend.Controllers
         public async Task<ActionResult> AbleToBuilt(int id, BuildOrderIsAbleToBuiltDto data)
         {
             // verifying
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
-            if (tokenId != 1)
-            {
-                return Unauthorized();
-            }
+            if (tokenId != 1) return Unauthorized();
 
             var buildOrder = await _context.BuildOrder.Where(o =>
                 o.Id == id &&
@@ -171,17 +174,14 @@ namespace ShopAppBackend.Controllers
                     .State == OrderStateEnum.Created
             ).FirstOrDefaultAsync();
 
-            if (buildOrder == null)
-            {
-                return NotFound();
-            }
+            if (buildOrder == null) return NotFound();
 
             // updating
             buildOrder.OrderStates = new List<OrderState>
             {
                 new OrderState
                 {
-                    State = data.IsAbleToBuilt ? OrderStateEnum.IsAbleToBuilt : OrderStateEnum.IsUnableToBuilt,
+                    State = data.IsAbleToBuilt ? OrderStateEnum.IsAbleToBuilt : OrderStateEnum.IsUnableToBuilt
                 }
             };
 
@@ -203,7 +203,7 @@ namespace ShopAppBackend.Controllers
         public async Task<ActionResult> AddedProofOfPaymentDeposit(int id, [FromForm] OrderAddProofOfPaymentDto data)
         {
             // verifying
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
             var buildOrder = await _context.BuildOrder.Where(o =>
                 o.Id == id &&
@@ -212,12 +212,9 @@ namespace ShopAppBackend.Controllers
                     .OrderByDescending(os => os.CreatedAt)
                     .First()
                     .State == OrderStateEnum.IsAbleToBuilt
-                ).FirstOrDefaultAsync();
+            ).FirstOrDefaultAsync();
 
-            if (buildOrder == null)
-            {
-                return NotFound();
-            }
+            if (buildOrder == null) return NotFound();
 
             // updating
             var fileName = await _imageService.Uploader(data.Image, false);
@@ -226,7 +223,7 @@ namespace ShopAppBackend.Controllers
             {
                 new OrderState
                 {
-                    State = OrderStateEnum.AddedProofOfPaymentDeposit,
+                    State = OrderStateEnum.AddedProofOfPaymentDeposit
                 }
             };
 
@@ -237,15 +234,13 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}/approve-proof-deposit")]
-        public async Task<ActionResult> ApprovedProofOfPaymentDeposit(int id, BuildOrderApprovedProofOfPaymentDepositDto data)
+        public async Task<ActionResult> ApprovedProofOfPaymentDeposit(int id,
+            BuildOrderApprovedProofOfPaymentDepositDto data)
         {
             // verifying
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
-            if (tokenId != 1)
-            {
-                return Unauthorized();
-            }
+            if (tokenId != 1) return Unauthorized();
 
             var buildOrder = await _context.BuildOrder.Where(o =>
                 o.Id == id &&
@@ -255,17 +250,14 @@ namespace ShopAppBackend.Controllers
                     .State == OrderStateEnum.AddedProofOfPaymentDeposit
             ).FirstOrDefaultAsync();
 
-            if (buildOrder == null)
-            {
-                return NotFound();
-            }
+            if (buildOrder == null) return NotFound();
 
             // updating
             buildOrder.OrderStates = new List<OrderState>
             {
                 new OrderState
                 {
-                    State = OrderStateEnum.ApprovedProofOfPaymentDeposit,
+                    State = OrderStateEnum.ApprovedProofOfPaymentDeposit
                 }
             };
 
@@ -279,12 +271,9 @@ namespace ShopAppBackend.Controllers
         public async Task<ActionResult> BuiltComplete(int id)
         {
             // verifying
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
-            if (tokenId != 1)
-            {
-                return Unauthorized();
-            }
+            if (tokenId != 1) return Unauthorized();
 
             var buildOrder = await _context.BuildOrder.Where(o =>
                 o.Id == id &&
@@ -294,17 +283,14 @@ namespace ShopAppBackend.Controllers
                     .State == OrderStateEnum.ApprovedProofOfPaymentDeposit
             ).FirstOrDefaultAsync();
 
-            if (buildOrder == null)
-            {
-                return NotFound();
-            }
+            if (buildOrder == null) return NotFound();
 
             // updating
             buildOrder.OrderStates = new List<OrderState>
             {
                 new OrderState
                 {
-                    State = OrderStateEnum.BuiltComplete,
+                    State = OrderStateEnum.BuiltComplete
                 }
             };
 
@@ -314,10 +300,11 @@ namespace ShopAppBackend.Controllers
 
 
         [HttpPut("{id}/add-proof-full")]
-        public async Task<ActionResult> AddProofOfPaymentFull(int id, [FromForm] BuildOrderAddProofOfPaymentFullDto data)
+        public async Task<ActionResult> AddProofOfPaymentFull(int id,
+            [FromForm] BuildOrderAddProofOfPaymentFullDto data)
         {
             // verifying
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
             var order = await _context.BuildOrder.Where(o =>
                 o.Id == id &&
@@ -326,12 +313,9 @@ namespace ShopAppBackend.Controllers
                     .OrderByDescending(os => os.CreatedAt)
                     .First()
                     .State == OrderStateEnum.BuiltComplete
-                ).FirstOrDefaultAsync();
+            ).FirstOrDefaultAsync();
 
-            if (order == null)
-            {
-                return NotFound();
-            }
+            if (order == null) return NotFound();
 
             // updating
             var fileName = await _imageService.Uploader(data.Image, false);
@@ -340,7 +324,7 @@ namespace ShopAppBackend.Controllers
             {
                 new OrderState
                 {
-                    State = OrderStateEnum.AddedProofOfPaymentFull,
+                    State = OrderStateEnum.AddedProofOfPaymentFull
                 }
             };
 
@@ -365,12 +349,9 @@ namespace ShopAppBackend.Controllers
         public async Task<ActionResult> ApproveProofOfPaymentFull(int id)
         {
             // verifying
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
-            if (tokenId != 1)
-            {
-                return Unauthorized();
-            }
+            if (tokenId != 1) return Unauthorized();
 
             var order = await _context.BuildOrder.Where(o =>
                 o.Id == id &&
@@ -380,17 +361,14 @@ namespace ShopAppBackend.Controllers
                     .State == OrderStateEnum.AddedProofOfPaymentFull
             ).FirstOrDefaultAsync();
 
-            if (order == null)
-            {
-                return NotFound();
-            }
+            if (order == null) return NotFound();
 
             // updating
             order.OrderStates = new List<OrderState>
             {
                 new OrderState
                 {
-                    State = OrderStateEnum.ApprovedProofOfPaymentFull,
+                    State = OrderStateEnum.ApprovedProofOfPaymentFull
                 }
             };
 
@@ -402,12 +380,9 @@ namespace ShopAppBackend.Controllers
         public async Task<ActionResult> Sent(int id, OrderSentDto data)
         {
             // verifying
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
-            if (tokenId != 1)
-            {
-                return Unauthorized();
-            }
+            if (tokenId != 1) return Unauthorized();
 
             var order = await _context.BuildOrder.Where(o =>
                 o.Id == id &&
@@ -417,17 +392,14 @@ namespace ShopAppBackend.Controllers
                     .State == OrderStateEnum.ApprovedProofOfPaymentFull
             ).FirstOrDefaultAsync();
 
-            if (order == null)
-            {
-                return NotFound();
-            }
+            if (order == null) return NotFound();
 
             // updating
             order.OrderStates = new List<OrderState>
             {
                 new OrderState
                 {
-                    State = OrderStateEnum.Sent,
+                    State = OrderStateEnum.Sent
                 }
             };
 
@@ -441,7 +413,7 @@ namespace ShopAppBackend.Controllers
         public async Task<ActionResult> Received(int id, OrderReceivedDto data)
         {
             // verifying
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
             var order = await _context.BuildOrder.Where(o =>
                 o.Id == id &&
@@ -452,17 +424,14 @@ namespace ShopAppBackend.Controllers
                     .State == OrderStateEnum.Sent
             ).FirstOrDefaultAsync();
 
-            if (order == null)
-            {
-                return NotFound();
-            }
+            if (order == null) return NotFound();
 
             // updating
             order.OrderStates = new List<OrderState>
             {
                 new OrderState
                 {
-                    State = OrderStateEnum.Received,
+                    State = OrderStateEnum.Received
                 }
             };
 
@@ -476,26 +445,20 @@ namespace ShopAppBackend.Controllers
         [HttpPut("{id}/cancelled/admin")]
         public async Task<ActionResult> Cancelled(int id, OrderCancelledDto data)
         {
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
-            if (tokenId != 1)
-            {
-                return Unauthorized();
-            }
+            if (tokenId != 1) return Unauthorized();
 
             var order = await _context.BuildOrder.Where(o => o.Id == id).FirstOrDefaultAsync();
 
-            if (order == null)
-            {
-                return NotFound();
-            }
+            if (order == null) return NotFound();
 
             // updating
             order.OrderStates = new List<OrderState>
             {
                 new OrderState
                 {
-                    State = OrderStateEnum.Cancelled,
+                    State = OrderStateEnum.Cancelled
                 }
             };
 
@@ -510,7 +473,7 @@ namespace ShopAppBackend.Controllers
         public async Task<ActionResult> Cancelled(int id)
         {
             // verifying
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
             var order = await _context.BuildOrder.Where(o =>
                 o.Id == id &&
@@ -526,17 +489,14 @@ namespace ShopAppBackend.Controllers
                         .State == OrderStateEnum.IsAbleToBuilt)
             ).FirstOrDefaultAsync();
 
-            if (order == null)
-            {
-                return NotFound();
-            }
+            if (order == null) return NotFound();
 
             // updating
             order.OrderStates = new List<OrderState>
             {
                 new OrderState
                 {
-                    State = OrderStateEnum.Cancelled,
+                    State = OrderStateEnum.Cancelled
                 }
             };
 

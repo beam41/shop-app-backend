@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShopAppBackend.Models;
 using ShopAppBackend.Models.Context;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using ShopAppBackend.Models.DTOs;
 
 namespace ShopAppBackend.Controllers
@@ -30,16 +29,13 @@ namespace ShopAppBackend.Controllers
         [HttpGet("list")]
         public async Task<ActionResult<IEnumerable<PromotionListDto>>> GetPromotionList()
         {
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
-            if (tokenId != 1)
-            {
-                return Unauthorized();
-            }
+            if (tokenId != 1) return Unauthorized();
 
             return await _context.Promotion
                 .Where(p => !p.Archived)
-                .Select(p => new PromotionListDto()
+                .Select(p => new PromotionListDto
                 {
                     Id = p.Id,
                     IsBroadcasted = p.IsBroadcasted,
@@ -52,20 +48,17 @@ namespace ShopAppBackend.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<PromotionDetailDto>> GetPromotion(int id)
         {
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
-            if (tokenId != 1)
-            {
-                return Unauthorized();
-            }
+            if (tokenId != 1) return Unauthorized();
 
-            var promotion = await _context.Promotion.Select(pro => new PromotionDetailDto()
+            var promotion = await _context.Promotion.Select(pro => new PromotionDetailDto
             {
                 Id = pro.Id,
                 Description = pro.Description,
                 IsBroadcasted = pro.IsBroadcasted,
                 Name = pro.Name,
-                PromotionItems = (ICollection<ProductDetailPromotionDto>)pro.PromotionItems
+                PromotionItems = (ICollection<ProductDetailPromotionDto>) pro.PromotionItems
                     .Where(pi => pi.InPromotionProduct.IsVisible && !pi.InPromotionProduct.Archived)
                     .Select(pi => new ProductDetailPromotionDto
                     {
@@ -89,14 +82,11 @@ namespace ShopAppBackend.Controllers
                                     .FirstOrDefault(pip => pip.Promotion.IsBroadcasted && !pip.Promotion.Archived)
                                     .Promotion
                                     .Id == id
-                                : (bool?)null
+                                : (bool?) null
                     })
             }).FirstOrDefaultAsync(p => p.Id == id);
 
-            if (promotion == null)
-            {
-                return NotFound();
-            }
+            if (promotion == null) return NotFound();
 
             return promotion;
         }
@@ -107,12 +97,9 @@ namespace ShopAppBackend.Controllers
         [HttpPost]
         public async Task<ActionResult<Promotion>> PostPromotion(PromotionFormDto promotion)
         {
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
-            if (tokenId != 1)
-            {
-                return Unauthorized();
-            }
+            if (tokenId != 1) return Unauthorized();
 
             var productIdList = promotion.PromotionItems.Select(p => p.ProductId);
 
@@ -122,7 +109,7 @@ namespace ShopAppBackend.Controllers
             _context.Promotion.Add(newPromotion);
             var promotionItems = new List<PromotionItem>();
             var products = new List<Product>();
-            foreach (PromotionItemsDto promotionItemDto in promotion.PromotionItems)
+            foreach (var promotionItemDto in promotion.PromotionItems)
             {
                 var product = new Product { Id = promotionItemDto.ProductId };
                 products.Add(product);
@@ -141,18 +128,14 @@ namespace ShopAppBackend.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetPromotion", new { id = newPromotion.Id }, newPromotion);
-
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult<Promotion>> PutPromotion(int id, PromotionFormDto promotion)
         {
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
-            if (tokenId != 1)
-            {
-                return Unauthorized();
-            }
+            if (tokenId != 1) return Unauthorized();
 
             var productIdList = promotion.PromotionItems.Select(p => p.ProductId);
 
@@ -165,12 +148,13 @@ namespace ShopAppBackend.Controllers
                 Description = promotion.Description,
                 IsBroadcasted = promotion.IsBroadcasted
             };
+
             _context.Entry(newPromotion).State = EntityState.Modified;
             _context.PromotionItem.RemoveRange(_context.PromotionItem.Where(x => x.Promotion.Id == id));
 
             var promotionItems = new List<PromotionItem>();
             var products = new List<Product>();
-            foreach (PromotionItemsDto promotionItemDto in promotion.PromotionItems)
+            foreach (var promotionItemDto in promotion.PromotionItems)
             {
                 var product = new Product { Id = promotionItemDto.ProductId };
                 products.Add(product);
@@ -185,25 +169,21 @@ namespace ShopAppBackend.Controllers
             }
 
             _context.AttachRange(products);
-            
+
             newPromotion.PromotionItems = promotionItems;
-            
+
 
             await _context.SaveChangesAsync();
 
             return NoContent();
-
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult<Promotion>> ArchivePromotion(int id)
         {
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
-            if (tokenId != 1)
-            {
-                return Unauthorized();
-            }
+            if (tokenId != 1) return Unauthorized();
 
             var promotion = new Promotion { Id = id, IsBroadcasted = false, Archived = true };
             _context.Entry(promotion).State = EntityState.Modified;
@@ -216,13 +196,17 @@ namespace ShopAppBackend.Controllers
         private Task<bool> ProductPromotionIsActive(IEnumerable<int> productId)
         {
             return _context.PromotionItem
-                .AnyAsync(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived && productId.Contains(pi.InPromotionProduct.Id));
+                .AnyAsync(pi =>
+                    pi.Promotion.IsBroadcasted && !pi.Promotion.Archived &&
+                    productId.Contains(pi.InPromotionProduct.Id));
         }
 
         private Task<bool> ProductPromotionIsActive(IEnumerable<int> productId, int promotionId)
         {
             return _context.PromotionItem
-                .AnyAsync(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived && pi.Promotion.Id != promotionId && productId.Contains(pi.InPromotionProduct.Id));
+                .AnyAsync(pi =>
+                    pi.Promotion.IsBroadcasted && !pi.Promotion.Archived && pi.Promotion.Id != promotionId &&
+                    productId.Contains(pi.InPromotionProduct.Id));
         }
 
         private Task<bool> PromotionExists(int id)

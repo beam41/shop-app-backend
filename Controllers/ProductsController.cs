@@ -1,16 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ShopAppBackend.Models;
-using ShopAppBackend.Models.Context;
-using ShopAppBackend.Services;
-using ShopAppBackend.Settings;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Primitives;
+using ShopAppBackend.Models;
+using ShopAppBackend.Models.Context;
 using ShopAppBackend.Models.DTOs;
+using ShopAppBackend.Services;
 
 namespace ShopAppBackend.Controllers
 {
@@ -53,7 +52,8 @@ namespace ShopAppBackend.Controllers
                     Id = p.Id,
                     Name = p.Name,
                     Price = p.Price,
-                    NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived).NewPrice,
+                    NewPrice = p.PromotionItems
+                        .FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived).NewPrice,
                     ImageUrl = p.ProductImages
                         .Select(pi => new ImageUrlDto
                         {
@@ -81,7 +81,8 @@ namespace ShopAppBackend.Controllers
                     Id = p.Id,
                     Name = p.Name,
                     Price = p.Price,
-                    NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived).NewPrice,
+                    NewPrice = p.PromotionItems
+                        .FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived).NewPrice,
                     ImageUrl = p.ProductImages
                         .Select(pi => new ImageUrlDto
                         {
@@ -107,14 +108,15 @@ namespace ShopAppBackend.Controllers
                 {
                     Id = pt.Id,
                     Name = pt.Name,
-                    ProductList = (ICollection<ProductDisplayDto>)pt.Products
+                    ProductList = (ICollection<ProductDisplayDto>) pt.Products
                         .Where(p => p.IsVisible && !p.Archived)
                         .Select(p => new ProductDisplayDto
                         {
                             Id = p.Id,
                             Name = p.Name,
                             Price = p.Price,
-                            NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived).NewPrice,
+                            NewPrice = p.PromotionItems
+                                .FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived).NewPrice,
                             ImageUrl = p.ProductImages
                                 .Select(pi => new ImageUrlDto
                                 {
@@ -134,13 +136,14 @@ namespace ShopAppBackend.Controllers
         public async Task<ActionResult<IEnumerable<PromotionDisplayDto>>> GetAllPromotionAndProduct()
         {
             return await _context.Promotion
-                .Where(p => p.IsBroadcasted && !p.Archived && p.PromotionItems.Any(pi => pi.InPromotionProduct.IsVisible && !pi.InPromotionProduct.Archived))
+                .Where(p => p.IsBroadcasted && !p.Archived && p.PromotionItems.Any(pi =>
+                    pi.InPromotionProduct.IsVisible && !pi.InPromotionProduct.Archived))
                 .Select(p => new PromotionDisplayDto
                 {
                     Id = p.Id,
                     Name = p.Name,
                     Description = p.Description,
-                    ProductList = (ICollection<ProductDisplayDto>)p.PromotionItems
+                    ProductList = (ICollection<ProductDisplayDto>) p.PromotionItems
                         .Where(pi => pi.InPromotionProduct.IsVisible && !pi.InPromotionProduct.Archived)
                         .Select(pro => new ProductDisplayDto
                         {
@@ -172,15 +175,17 @@ namespace ShopAppBackend.Controllers
                     Id = p.Id,
                     Name = p.Name,
                     Price = p.Price,
-                    NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived).NewPrice,
-                    ImageUrls = (ICollection<ImageUrlDto>)p.ProductImages
+                    NewPrice = p.PromotionItems
+                        .FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived).NewPrice,
+                    ImageUrls = (ICollection<ImageUrlDto>) p.ProductImages
                         .Select(pi => new ImageUrlDto
                         {
                             Id = pi.Id,
                             ImageUrl = _imageService.GetImageUrl(pi.ImageFileName)
                         }),
                     Description = p.Description,
-                    Promotion = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived).Promotion
+                    Promotion = p.PromotionItems
+                        .FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived).Promotion
                 })
                 .FirstOrDefaultAsync(i => i.Id == id);
 
@@ -192,12 +197,9 @@ namespace ShopAppBackend.Controllers
         [HttpGet("list")]
         public async Task<ActionResult<IEnumerable<ProductListDto>>> GetProductList()
         {
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
-            if (tokenId != 1)
-            {
-                return Unauthorized();
-            }
+            if (tokenId != 1) return Unauthorized();
 
             return await _context.Product
                 .Where(p => !p.Archived)
@@ -209,7 +211,8 @@ namespace ShopAppBackend.Controllers
                     Type = p.Type.Name,
                     IsVisible = p.IsVisible,
                     InPromotion = p.PromotionItems.Any(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived),
-                    NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived).NewPrice
+                    NewPrice = p.PromotionItems
+                        .FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived).NewPrice
                 })
                 .ToListAsync();
         }
@@ -217,12 +220,9 @@ namespace ShopAppBackend.Controllers
         [HttpGet("{id}/admin")]
         public async Task<ActionResult<ProductDetailAdminDto>> GetProductAdmin(int id)
         {
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
-            if (tokenId != 1)
-            {
-                return Unauthorized();
-            }
+            if (tokenId != 1) return Unauthorized();
 
             var product = await _context.Product
                 .Where(p => !p.Archived)
@@ -231,7 +231,7 @@ namespace ShopAppBackend.Controllers
                     Id = p.Id,
                     Name = p.Name,
                     Price = p.Price,
-                    Images = (ICollection<ImageUrlDto>)p.ProductImages
+                    Images = (ICollection<ImageUrlDto>) p.ProductImages
                         .Select(pi => new ImageUrlDto
                         {
                             Id = pi.Id,
@@ -252,24 +252,23 @@ namespace ShopAppBackend.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<List<ProductListDto>>> SearchProduct()
         {
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
-            if (tokenId != 1)
-            {
-                return Unauthorized();
-            }
+            if (tokenId != 1) return Unauthorized();
 
             var query = Request.Query["q"];
             if (StringValues.IsNullOrEmpty(query)) return BadRequest();
 
             var product = await _context.Product
-                .Where(p => !p.Archived && !p.PromotionItems.Any(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived) && p.Name.Contains(query))
+                .Where(p => !p.Archived &&
+                            !p.PromotionItems.Any(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived) &&
+                            p.Name.Contains(query))
                 .Select(p => new ProductListDto
                 {
                     Id = p.Id,
                     Name = p.Name,
                     Price = p.Price,
-                    IsVisible = p.IsVisible,
+                    IsVisible = p.IsVisible
                 })
                 .ToListAsync();
 
@@ -279,12 +278,9 @@ namespace ShopAppBackend.Controllers
         [HttpPost]
         public async Task<ActionResult<Product>> AddProduct([FromForm] ProductAddFormDto productAdd)
         {
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
-            if (tokenId != 1)
-            {
-                return Unauthorized();
-            }
+            if (tokenId != 1) return Unauthorized();
 
             var type = new ProductType { Id = productAdd.TypeId };
             _context.Attach(type);
@@ -311,19 +307,14 @@ namespace ShopAppBackend.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<Product>> EditProduct(int id, [FromForm] ProductEditFormDto productEdit)
         {
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
-            if (tokenId != 1)
-            {
-                return Unauthorized();
-            }
+            if (tokenId != 1) return Unauthorized();
 
-            var product = await _context.Product.Include(p => p.ProductImages).FirstOrDefaultAsync(p => p.Id == id && !p.Archived);
+            var product = await _context.Product.Include(p => p.ProductImages)
+                .FirstOrDefaultAsync(p => p.Id == id && !p.Archived);
 
-            if (product == null)
-            {
-                return NotFound();
-            }
+            if (product == null) return NotFound();
 
             var type = new ProductType { Id = productEdit.TypeId };
             _context.Attach(type);
@@ -339,7 +330,8 @@ namespace ShopAppBackend.Controllers
             if (productEdit.MarkForDeleteId != null)
             {
                 markForDelImages = product.ProductImages.Where(pi => productEdit.MarkForDeleteId.Contains(pi.Id));
-                product.ProductImages = product.ProductImages.Where(pi => !productEdit.MarkForDeleteId.Contains(pi.Id)).ToList();
+                product.ProductImages = product.ProductImages.Where(pi => !productEdit.MarkForDeleteId.Contains(pi.Id))
+                    .ToList();
             }
 
             var fileNameList = productEdit.Images?.Select(async p =>
@@ -349,17 +341,11 @@ namespace ShopAppBackend.Controllers
                 product.ProductImages.Add(pi);
             }).ToArray();
 
-            if (fileNameList != null)
-            {
-                Task.WaitAll(fileNameList);
-            }
+            if (fileNameList != null) Task.WaitAll(fileNameList);
 
             await _context.SaveChangesAsync();
 
-            foreach (var productImage in markForDelImages)
-            {
-                _imageService.DeleteFile(productImage.ImageFileName);
-            }
+            foreach (var productImage in markForDelImages) _imageService.DeleteFile(productImage.ImageFileName);
 
             GC.Collect();
             return NoContent();
@@ -368,27 +354,18 @@ namespace ShopAppBackend.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Product>> ArchiveProduct(int id)
         {
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
-            if (tokenId != 1)
-            {
-                return Unauthorized();
-            }
+            if (tokenId != 1) return Unauthorized();
 
             var product = await _context.Product.Include(p => p.ProductImages).FirstOrDefaultAsync(p => p.Id == id);
 
-            if (product == null)
-            {
-                return NotFound();
-            }
+            if (product == null) return NotFound();
 
             product.IsVisible = false;
             product.Archived = true;
 
-            foreach (var productImage in product.ProductImages)
-            {
-                _imageService.DeleteFile(productImage.ImageFileName);
-            }
+            foreach (var productImage in product.ProductImages) _imageService.DeleteFile(productImage.ImageFileName);
 
             product.ProductImages = new List<ProductImage>();
 

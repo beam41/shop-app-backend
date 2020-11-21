@@ -1,15 +1,11 @@
-﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
-using Microsoft.IdentityModel.Tokens;
-using ShopAppBackend.Models;
-using ShopAppBackend.Settings;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.IdentityModel.Tokens;
 using ShopAppBackend.Models.DTOs;
+using ShopAppBackend.Settings;
 
 namespace ShopAppBackend.Services
 {
@@ -25,27 +21,29 @@ namespace ShopAppBackend.Services
         public string HashPassword(string password)
         {
             return Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: password,
-                salt: Encoding.ASCII.GetBytes(_userSettings.PasswordSalt),
-                prf: KeyDerivationPrf.HMACSHA1,
-                iterationCount: 10000,
-                numBytesRequested: 32));
+                password,
+                Encoding.ASCII.GetBytes(_userSettings.PasswordSalt),
+                KeyDerivationPrf.HMACSHA1,
+                10000,
+                32));
         }
 
         public void GenToken(UserLoginDto user)
         {
-            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-            byte[] key = Encoding.ASCII.GetBytes(_userSettings.Secret);
-            SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_userSettings.Secret);
+            var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new Claim[]
+                Subject = new ClaimsIdentity(new[]
                 {
                     new Claim("Id", user.Id.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256Signature)
             };
-            SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
             user.Token = tokenHandler.WriteToken(token);
         }
     }

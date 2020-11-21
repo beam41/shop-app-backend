@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShopAppBackend.Models;
@@ -30,15 +28,12 @@ namespace ShopAppBackend.Controllers
         [HttpPut]
         public async Task<IActionResult> PutDistributionMethod(IEnumerable<DistributionMethod> distributionMethod)
         {
-            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
-            if (tokenId != 1)
-            {
-                return Unauthorized();
-            }
+            if (tokenId != 1) return Unauthorized();
 
             (await _context.DistributionMethod.Where(d => !d.Archived)
-                .ToListAsync())
+                    .ToListAsync())
                 .ForEach(d => d.Archived = true);
 
             _context.DistributionMethod.AddRange(distributionMethod);

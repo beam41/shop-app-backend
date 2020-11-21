@@ -25,8 +25,7 @@
         public static implicit operator UserLoginDto(User u)
         {
             if (u != null)
-            {
-                return new UserLoginDto()
+                return new UserLoginDto
                 {
                     Id = u.Id,
                     Username = u.Username,
@@ -38,7 +37,7 @@
                     SubDistrict = u.SubDistrict,
                     PostalCode = u.PostalCode
                 };
-            }
+
             return null;
         }
     }

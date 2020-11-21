@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using ShopAppBackend.Models.DTOs;
 
 namespace ShopAppBackend.Controllers
 {
@@ -43,7 +44,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpGet("list")]
-        public async Task<ActionResult<IEnumerable<ProductTypeListDTO>>> GetProductTypeList()
+        public async Task<ActionResult<IEnumerable<ProductTypeListDto>>> GetProductTypeList()
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
@@ -54,7 +55,7 @@ namespace ShopAppBackend.Controllers
 
             return await _context.ProductType
                 .Where(pt => !pt.Archived)
-                .Select(pt => new ProductTypeListDTO
+                .Select(pt => new ProductTypeListDto
                 {
                     Id = pt.Id,
                     Name = pt.Name,
@@ -64,7 +65,7 @@ namespace ShopAppBackend.Controllers
 
         // GET: api/ProductTypes/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ProductTypeDetailDTO>> GetProductType(int id)
+        public async Task<ActionResult<ProductTypeDetailDto>> GetProductType(int id)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
@@ -75,13 +76,13 @@ namespace ShopAppBackend.Controllers
 
             var productType = await _context.ProductType
                 .Where(pt => !pt.Archived)
-                .Select(p => new ProductTypeDetailDTO
+                .Select(p => new ProductTypeDetailDto
                 {
                     Id = p.Id,
                     Name = p.Name,
-                    ProductList = (ICollection<ProductListInTypeDTO>) p.Products
+                    ProductList = (ICollection<ProductListInTypeDto>) p.Products
                         .Where(p => !p.Archived)
-                        .Select(pro => new ProductListInTypeDTO
+                        .Select(pro => new ProductListInTypeDto
                         {
                             Id = pro.Id,
                             Name = pro.Name,
@@ -101,7 +102,7 @@ namespace ShopAppBackend.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> EditProductType(int id, ProductTypeInputDTO productType)
+        public async Task<IActionResult> EditProductType(int id, ProductTypeInputDto productType)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
@@ -122,7 +123,7 @@ namespace ShopAppBackend.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<ProductType>> AddProductType(ProductTypeInputDTO productType)
+        public async Task<ActionResult<ProductType>> AddProductType(ProductTypeInputDto productType)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 

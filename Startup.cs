@@ -11,6 +11,7 @@ using ShopAppBackend.Models.Context;
 using ShopAppBackend.Services;
 using ShopAppBackend.Settings;
 using System.Text;
+using ShopAppBackend.Settings.Interfaces;
 
 namespace ShopAppBackend
 {

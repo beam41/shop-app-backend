@@ -21,11 +21,4 @@ namespace ShopAppBackend.Models
 
         public double? SavedNewPrice { get; set; }
     }
-
-    public class OrderProductCreateDTO
-    {
-        public int ProductId { get; set; }
-
-        public int Amount { get; set; }
-    }
 }

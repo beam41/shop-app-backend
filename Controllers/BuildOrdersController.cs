@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using ShopAppBackend.Enums;
 using ShopAppBackend.Models;
 using ShopAppBackend.Models.Context;
+using ShopAppBackend.Models.DTOs;
 using ShopAppBackend.Services;
 
 namespace ShopAppBackend.Controllers
@@ -39,13 +40,13 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpGet("list")]
-        public async Task<ActionResult<IEnumerable<BuildOrderListDTO>>> GetBuildOrderList()
+        public async Task<ActionResult<IEnumerable<BuildOrderListDto>>> GetBuildOrderList()
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
             return await _context.BuildOrder
                 .Where(o => o.CreatedByUser.Id == tokenId)
-                .Select(o => new BuildOrderListDTO
+                .Select(o => new BuildOrderListDto
                 {
                     Id = o.Id,
                     UpdatedDate = o.OrderStates.Max(os => os.CreatedAt),
@@ -58,17 +59,17 @@ namespace ShopAppBackend.Controllers
 
         // GET: api/BuildOrders/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<BuildOrderViewDTO>> GetBuildOrder(int id)
+        public async Task<ActionResult<BuildOrderViewDto>> GetBuildOrder(int id)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
             var buildOrder = await _context.BuildOrder
                 .Where(o => tokenId == 1 || o.CreatedByUser.Id == tokenId)
-                .Select(o => new BuildOrderViewDTO
+                .Select(o => new BuildOrderViewDto
                 {
                     Id = o.Id,
                     DistributionMethod = o.DistributionMethod,
-                    OrderStates = (ICollection<OrderStateDTO>)o.OrderStates.Select(os => new OrderStateDTO
+                    OrderStates = (ICollection<OrderStateDto>)o.OrderStates.Select(os => new OrderStateDto
                     {
                         Id = os.Id,
                         CreatedAt = os.CreatedAt,
@@ -93,7 +94,7 @@ namespace ShopAppBackend.Controllers
                     ExpectedCompleteDate = o.ExpectedCompleteDate,
                     AddressFullName = o.AddressFullName,
                     AddressPhoneNumber = o.AddressPhoneNumber,
-                    DescriptionImagesUrl = (ICollection<ImageUrlDTO>) o.DescriptionImages.Select(im => new ImageUrlDTO()
+                    DescriptionImagesUrl = (ICollection<ImageUrlDto>) o.DescriptionImages.Select(im => new ImageUrlDto()
                     {
                         Id = im.Id,
                         ImageUrl = _imageService.GetImageUrl(im.ImageFileName)
@@ -114,7 +115,7 @@ namespace ShopAppBackend.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<BuildOrder>> PostBuildOrder([FromForm] BuildOrderCreateDTO buildOrder)
+        public async Task<ActionResult<BuildOrder>> PostBuildOrder([FromForm] BuildOrderCreateDto buildOrder)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
@@ -152,7 +153,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}/able-to-built")]
-        public async Task<ActionResult> AbleToBuilt(int id, BuildOrderIsAbleToBuiltDTO data)
+        public async Task<ActionResult> AbleToBuilt(int id, BuildOrderIsAbleToBuiltDto data)
         {
             // verifying
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
@@ -199,7 +200,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}/add-proof-deposit")]
-        public async Task<ActionResult> AddedProofOfPaymentDeposit(int id, [FromForm] OrderAddProofOfPaymentDTO data)
+        public async Task<ActionResult> AddedProofOfPaymentDeposit(int id, [FromForm] OrderAddProofOfPaymentDto data)
         {
             // verifying
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
@@ -236,7 +237,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}/approve-proof-deposit")]
-        public async Task<ActionResult> ApprovedProofOfPaymentDeposit(int id, BuildOrderApprovedProofOfPaymentDepositDTO data)
+        public async Task<ActionResult> ApprovedProofOfPaymentDeposit(int id, BuildOrderApprovedProofOfPaymentDepositDto data)
         {
             // verifying
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
@@ -313,7 +314,7 @@ namespace ShopAppBackend.Controllers
 
 
         [HttpPut("{id}/add-proof-full")]
-        public async Task<ActionResult> AddProofOfPaymentFull(int id, [FromForm] BuildOrderAddProofOfPaymentFullDTO data)
+        public async Task<ActionResult> AddProofOfPaymentFull(int id, [FromForm] BuildOrderAddProofOfPaymentFullDto data)
         {
             // verifying
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
@@ -398,7 +399,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}/sent")]
-        public async Task<ActionResult> Sent(int id, OrderSentDTO data)
+        public async Task<ActionResult> Sent(int id, OrderSentDto data)
         {
             // verifying
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
@@ -437,7 +438,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}/received")]
-        public async Task<ActionResult> Received(int id, OrderReceivedDTO data)
+        public async Task<ActionResult> Received(int id, OrderReceivedDto data)
         {
             // verifying
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
@@ -473,7 +474,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}/cancelled/admin")]
-        public async Task<ActionResult> Cancelled(int id, OrderCancelledDTO data)
+        public async Task<ActionResult> Cancelled(int id, OrderCancelledDto data)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 

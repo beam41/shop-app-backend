@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Primitives;
+using ShopAppBackend.Models.DTOs;
 
 namespace ShopAppBackend.Controllers
 {
@@ -41,20 +42,20 @@ namespace ShopAppBackend.Controllers
 
         [HttpGet("recommend")]
         [AllowAnonymous]
-        public async Task<ActionResult<IEnumerable<ProductDisplayDTO>>> GetRecommend()
+        public async Task<ActionResult<IEnumerable<ProductDisplayDto>>> GetRecommend()
         {
             if (!int.TryParse(Request.Query["amount"], out var amount)) return BadRequest();
 
             return await _context.Product
                 .Where(p => p.IsVisible && !p.Archived)
-                .Select(p => new ProductDisplayDTO
+                .Select(p => new ProductDisplayDto
                 {
                     Id = p.Id,
                     Name = p.Name,
                     Price = p.Price,
                     NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived).NewPrice,
                     ImageUrl = p.ProductImages
-                        .Select(pi => new ImageUrlDTO
+                        .Select(pi => new ImageUrlDto
                         {
                             Id = pi.Id,
                             ImageUrl = _imageService.GetImageUrl(pi.ImageFileName)
@@ -69,20 +70,20 @@ namespace ShopAppBackend.Controllers
 
         [HttpGet("type/{type}")]
         [AllowAnonymous]
-        public async Task<ActionResult<IEnumerable<ProductDisplayDTO>>> GetByType(string type)
+        public async Task<ActionResult<IEnumerable<ProductDisplayDto>>> GetByType(string type)
         {
             if (!await ProductTypeExists(type)) return NotFound();
 
             var query = _context.Product
                 .Where(p => p.IsVisible && !p.Archived && p.Type.Name == type)
-                .Select(p => new ProductDisplayDTO
+                .Select(p => new ProductDisplayDto
                 {
                     Id = p.Id,
                     Name = p.Name,
                     Price = p.Price,
                     NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived).NewPrice,
                     ImageUrl = p.ProductImages
-                        .Select(pi => new ImageUrlDTO
+                        .Select(pi => new ImageUrlDto
                         {
                             Id = pi.Id,
                             ImageUrl = _imageService.GetImageUrl(pi.ImageFileName)
@@ -96,26 +97,26 @@ namespace ShopAppBackend.Controllers
 
         [HttpGet("type")]
         [AllowAnonymous]
-        public async Task<ActionResult<IEnumerable<ProductTypeDisplayDTO>>> GetAllTypeAndProduct()
+        public async Task<ActionResult<IEnumerable<ProductTypeDisplayDto>>> GetAllTypeAndProduct()
         {
             if (!int.TryParse(Request.Query["amount"], out var amount)) return BadRequest();
 
             return await _context.ProductType
                 .Where(pt => !pt.Archived && pt.Products.Any(p => p.IsVisible && !p.Archived))
-                .Select(pt => new ProductTypeDisplayDTO
+                .Select(pt => new ProductTypeDisplayDto
                 {
                     Id = pt.Id,
                     Name = pt.Name,
-                    ProductList = (ICollection<ProductDisplayDTO>)pt.Products
+                    ProductList = (ICollection<ProductDisplayDto>)pt.Products
                         .Where(p => p.IsVisible && !p.Archived)
-                        .Select(p => new ProductDisplayDTO
+                        .Select(p => new ProductDisplayDto
                         {
                             Id = p.Id,
                             Name = p.Name,
                             Price = p.Price,
                             NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived).NewPrice,
                             ImageUrl = p.ProductImages
-                                .Select(pi => new ImageUrlDTO
+                                .Select(pi => new ImageUrlDto
                                 {
                                     Id = pi.Id,
                                     ImageUrl = _imageService.GetImageUrl(pi.ImageFileName)
@@ -130,25 +131,25 @@ namespace ShopAppBackend.Controllers
 
         [HttpGet("promotion")]
         [AllowAnonymous]
-        public async Task<ActionResult<IEnumerable<PromotionDisplayDTO>>> GetAllPromotionAndProduct()
+        public async Task<ActionResult<IEnumerable<PromotionDisplayDto>>> GetAllPromotionAndProduct()
         {
             return await _context.Promotion
                 .Where(p => p.IsBroadcasted && !p.Archived && p.PromotionItems.Any(pi => pi.InPromotionProduct.IsVisible && !pi.InPromotionProduct.Archived))
-                .Select(p => new PromotionDisplayDTO
+                .Select(p => new PromotionDisplayDto
                 {
                     Id = p.Id,
                     Name = p.Name,
                     Description = p.Description,
-                    ProductList = (ICollection<ProductDisplayDTO>)p.PromotionItems
+                    ProductList = (ICollection<ProductDisplayDto>)p.PromotionItems
                         .Where(pi => pi.InPromotionProduct.IsVisible && !pi.InPromotionProduct.Archived)
-                        .Select(pro => new ProductDisplayDTO
+                        .Select(pro => new ProductDisplayDto
                         {
                             Id = pro.InPromotionProduct.Id,
                             Name = pro.InPromotionProduct.Name,
                             Price = pro.InPromotionProduct.Price,
                             NewPrice = pro.NewPrice,
                             ImageUrl = pro.InPromotionProduct.ProductImages
-                                .Select(pi => new ImageUrlDTO
+                                .Select(pi => new ImageUrlDto
                                 {
                                     Id = pi.Id,
                                     ImageUrl = _imageService.GetImageUrl(pi.ImageFileName)
@@ -162,18 +163,18 @@ namespace ShopAppBackend.Controllers
 
         [HttpGet("{id}")]
         [AllowAnonymous]
-        public async Task<ActionResult<ProductDetailDTO>> GetProduct(int id)
+        public async Task<ActionResult<ProductDetailDto>> GetProduct(int id)
         {
             var product = await _context.Product
                 .Where(p => !p.Archived)
-                .Select(p => new ProductDetailDTO
+                .Select(p => new ProductDetailDto
                 {
                     Id = p.Id,
                     Name = p.Name,
                     Price = p.Price,
                     NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived).NewPrice,
-                    ImageUrls = (ICollection<ImageUrlDTO>)p.ProductImages
-                        .Select(pi => new ImageUrlDTO
+                    ImageUrls = (ICollection<ImageUrlDto>)p.ProductImages
+                        .Select(pi => new ImageUrlDto
                         {
                             Id = pi.Id,
                             ImageUrl = _imageService.GetImageUrl(pi.ImageFileName)
@@ -189,7 +190,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpGet("list")]
-        public async Task<ActionResult<IEnumerable<ProductListDTO>>> GetProductList()
+        public async Task<ActionResult<IEnumerable<ProductListDto>>> GetProductList()
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
@@ -200,7 +201,7 @@ namespace ShopAppBackend.Controllers
 
             return await _context.Product
                 .Where(p => !p.Archived)
-                .Select(p => new ProductListDTO
+                .Select(p => new ProductListDto
                 {
                     Id = p.Id,
                     Name = p.Name,
@@ -214,7 +215,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpGet("{id}/admin")]
-        public async Task<ActionResult<ProductDetailAdminDTO>> GetProductAdmin(int id)
+        public async Task<ActionResult<ProductDetailAdminDto>> GetProductAdmin(int id)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
@@ -225,13 +226,13 @@ namespace ShopAppBackend.Controllers
 
             var product = await _context.Product
                 .Where(p => !p.Archived)
-                .Select(p => new ProductDetailAdminDTO
+                .Select(p => new ProductDetailAdminDto
                 {
                     Id = p.Id,
                     Name = p.Name,
                     Price = p.Price,
-                    Images = (ICollection<ImageUrlDTO>)p.ProductImages
-                        .Select(pi => new ImageUrlDTO
+                    Images = (ICollection<ImageUrlDto>)p.ProductImages
+                        .Select(pi => new ImageUrlDto
                         {
                             Id = pi.Id,
                             ImageUrl = _imageService.GetImageUrl(pi.ImageFileName)
@@ -249,7 +250,7 @@ namespace ShopAppBackend.Controllers
 
         [HttpGet("search")]
         [AllowAnonymous]
-        public async Task<ActionResult<List<ProductListDTO>>> SearchProduct()
+        public async Task<ActionResult<List<ProductListDto>>> SearchProduct()
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
@@ -263,7 +264,7 @@ namespace ShopAppBackend.Controllers
 
             var product = await _context.Product
                 .Where(p => !p.Archived && !p.PromotionItems.Any(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived) && p.Name.Contains(query))
-                .Select(p => new ProductListDTO
+                .Select(p => new ProductListDto
                 {
                     Id = p.Id,
                     Name = p.Name,
@@ -276,7 +277,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Product>> AddProduct([FromForm] ProductAddFormDTO productAdd)
+        public async Task<ActionResult<Product>> AddProduct([FromForm] ProductAddFormDto productAdd)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
@@ -308,7 +309,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Product>> EditProduct(int id, [FromForm] ProductEditFormDTO productEdit)
+        public async Task<ActionResult<Product>> EditProduct(int id, [FromForm] ProductEditFormDto productEdit)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 

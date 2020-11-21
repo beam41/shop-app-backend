@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
 
-namespace ShopAppBackend.Util
+namespace ShopAppBackend.Utils
 {
     public class CaseChanger
     {

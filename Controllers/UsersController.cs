@@ -15,6 +15,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ShopAppBackend.Enums;
+using ShopAppBackend.Models.DTOs;
 
 namespace ShopAppBackend.Controllers
 {
@@ -43,13 +44,13 @@ namespace ShopAppBackend.Controllers
 
         // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserFormDTO>> GetUser(int id)
+        public async Task<ActionResult<UserFormDto>> GetUser(int id)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
             if (tokenId != 1) return BadRequest();
 
-            var user = await _context.User.Select(u => new UserFormDTO
+            var user = await _context.User.Select(u => new UserFormDto
             {
                 Id = u.Id,
                 Username = u.Username,
@@ -71,13 +72,13 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpGet("list")]
-        public async Task<ActionResult<IEnumerable<UserListDTO>>> GetUserList()
+        public async Task<ActionResult<IEnumerable<UserListDto>>> GetUserList()
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
             if (tokenId != 1) return BadRequest();
 
-            return await _context.User.Select(u => new UserListDTO
+            return await _context.User.Select(u => new UserListDto
             {
                 Id = u.Id,
                 Username = u.Username,
@@ -101,14 +102,14 @@ namespace ShopAppBackend.Controllers
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<ActionResult<UserLoginDTO>> Register(User user)
+        public async Task<ActionResult<UserLoginDto>> Register(User user)
         {
             user.Password = _authService.HashPassword(user.Password);
 
             _context.User.Add(user);
             await _context.SaveChangesAsync();
 
-            UserLoginDTO newUser = user;
+            UserLoginDto newUser = user;
 
             _authService.GenToken(newUser);
 
@@ -117,11 +118,11 @@ namespace ShopAppBackend.Controllers
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<ActionResult<UserLoginDTO>> Login(UserLoginFormDTO userBody)
+        public async Task<ActionResult<UserLoginDto>> Login(UserLoginFormDto userBody)
         {
             var passwordHash = _authService.HashPassword(userBody.Password);
 
-            UserLoginDTO user = await _context.User
+            UserLoginDto user = await _context.User
                 .FirstOrDefaultAsync(u =>
                     u.Username == userBody.Username &&
                     u.Password == passwordHash
@@ -140,7 +141,7 @@ namespace ShopAppBackend.Controllers
 
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> EditUser(int id, UserEditDTO userInfo)
+        public async Task<IActionResult> EditUser(int id, UserEditDto userInfo)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 

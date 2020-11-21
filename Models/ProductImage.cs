@@ -12,11 +12,4 @@ namespace ShopAppBackend.Models
         [Required]
         public string ImageFileName { get; set; }
     }
-
-    public class ImageUrlDTO
-    {
-        public int Id { get; set; }
-
-        public string ImageUrl { get; set; }
-    }
 }

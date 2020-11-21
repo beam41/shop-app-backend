@@ -21,13 +21,4 @@ namespace ShopAppBackend.Models
 
         public BuildOrder BuildOrder { get; set; }
     }
-
-    public class OrderStateDTO
-    {
-        public int Id { get; set; }
-
-        public OrderStateEnum State { get; set; }
-
-        public DateTimeOffset CreatedAt { get; set; }
-    }
 }

@@ -15,11 +15,4 @@ namespace ShopAppBackend.Models
         [Required]
         public double NewPrice { get; set; }
     }
-
-    public class PromotionItemsDTO
-    {
-        public int ProductId { get; set; }
-
-        public double NewPrice { get; set; }
-    }
 }

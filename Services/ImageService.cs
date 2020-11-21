@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Flurl;
+using ShopAppBackend.Settings.Interfaces;
 
 namespace ShopAppBackend.Services
 {

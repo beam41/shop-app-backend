@@ -9,6 +9,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using ShopAppBackend.Models.DTOs;
 
 namespace ShopAppBackend.Services
 {
@@ -31,7 +32,7 @@ namespace ShopAppBackend.Services
                 numBytesRequested: 32));
         }
 
-        public void GenToken(UserLoginDTO user)
+        public void GenToken(UserLoginDto user)
         {
             JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
             byte[] key = Encoding.ASCII.GetBytes(_userSettings.Secret);

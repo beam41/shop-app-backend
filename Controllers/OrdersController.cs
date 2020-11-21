@@ -12,8 +12,9 @@ using Newtonsoft.Json.Serialization;
 using ShopAppBackend.Enums;
 using ShopAppBackend.Models;
 using ShopAppBackend.Models.Context;
+using ShopAppBackend.Models.DTOs;
 using ShopAppBackend.Services;
-using ShopAppBackend.Util;
+using ShopAppBackend.Utils;
 
 namespace ShopAppBackend.Controllers
 {
@@ -40,7 +41,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpGet("list/admin/{state}")]
-        public async Task<ActionResult<IEnumerable<OrderListAdminDTO>>> GetOrderList(string state)
+        public async Task<ActionResult<IEnumerable<OrderListAdminDto>>> GetOrderList(string state)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
@@ -60,7 +61,7 @@ namespace ShopAppBackend.Controllers
                     .First()
                     .State == stateEnum
                 )
-                .Select(o => new OrderListAdminDTO
+                .Select(o => new OrderListAdminDto
                 {
                     Id = o.Id,
                     CreatedByUser = new User
@@ -80,13 +81,13 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpGet("list")]
-        public async Task<ActionResult<IEnumerable<OrderListDTO>>> GetOrderList()
+        public async Task<ActionResult<IEnumerable<OrderListDto>>> GetOrderList()
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
             return await _context.Order
                 .Where(o => o.CreatedByUser.Id == tokenId)
-                .Select(o => new OrderListDTO
+                .Select(o => new OrderListDto
                 {
                     Id = o.Id,
                     ProductsName = (ICollection<string>) o.OrderProducts.Select(op => op.Product.Name),
@@ -101,24 +102,24 @@ namespace ShopAppBackend.Controllers
 
         // GET: api/Orders/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<OrderViewDTO>> GetOrder(int id)
+        public async Task<ActionResult<OrderViewDto>> GetOrder(int id)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
             var order = await _context.Order
                 .Where(o => tokenId == 1 || o.CreatedByUser.Id == tokenId)
-                .Select(o => new OrderViewDTO
+                .Select(o => new OrderViewDto
                 {
                     Id = o.Id,
                     PurchaseMethod = o.PurchaseMethod,
                     DistributionMethod = o.DistributionMethod,
-                    OrderStates = (ICollection<OrderStateDTO>)o.OrderStates.Select(os => new OrderStateDTO
+                    OrderStates = (ICollection<OrderStateDto>)o.OrderStates.Select(os => new OrderStateDto
                     {
                         Id = os.Id,
                         CreatedAt = os.CreatedAt,
                         State = os.State,
                     }).OrderBy(os => os.CreatedAt),
-                    Products = (ICollection<ProductOrderDetailDTO>)o.OrderProducts.Select(op => new ProductOrderDetailDTO
+                    Products = (ICollection<ProductOrderDetailDto>)o.OrderProducts.Select(op => new ProductOrderDetailDto
                     {
                         Id = op.Product.Id,
                         Name = op.Product.Name,
@@ -151,7 +152,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPost("new")]
-        public async Task<ActionResult<Order>> CreateOrder(OrderCreateDTO order)
+        public async Task<ActionResult<Order>> CreateOrder(OrderCreateDto order)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
@@ -213,7 +214,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}/add-proof-full")]
-        public async Task<ActionResult> AddProofOfPaymentFull(int id, [FromForm] OrderAddProofOfPaymentDTO data)
+        public async Task<ActionResult> AddProofOfPaymentFull(int id, [FromForm] OrderAddProofOfPaymentDto data)
         {
             // verifying
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
@@ -287,7 +288,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}/sent")]
-        public async Task<ActionResult> Sent(int id, OrderSentDTO data)
+        public async Task<ActionResult> Sent(int id, OrderSentDto data)
         {
             // verifying
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
@@ -328,7 +329,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}/received")]
-        public async Task<ActionResult> Received(int id, OrderReceivedDTO data)
+        public async Task<ActionResult> Received(int id, OrderReceivedDto data)
         {
             // verifying
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
@@ -364,7 +365,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}/cancelled/admin")]
-        public async Task<ActionResult> Cancelled(int id, OrderCancelledDTO data)
+        public async Task<ActionResult> Cancelled(int id, OrderCancelledDto data)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 

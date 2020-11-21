@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ShopAppBackend.Models.DTOs;
 
 namespace ShopAppBackend.Controllers
 {
@@ -27,7 +28,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpGet("list")]
-        public async Task<ActionResult<IEnumerable<PromotionListDTO>>> GetPromotionList()
+        public async Task<ActionResult<IEnumerable<PromotionListDto>>> GetPromotionList()
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
@@ -38,7 +39,7 @@ namespace ShopAppBackend.Controllers
 
             return await _context.Promotion
                 .Where(p => !p.Archived)
-                .Select(p => new PromotionListDTO()
+                .Select(p => new PromotionListDto()
                 {
                     Id = p.Id,
                     IsBroadcasted = p.IsBroadcasted,
@@ -49,7 +50,7 @@ namespace ShopAppBackend.Controllers
 
         // GET: api/Promotions/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<PromotionDetailDTO>> GetPromotion(int id)
+        public async Task<ActionResult<PromotionDetailDto>> GetPromotion(int id)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
@@ -58,15 +59,15 @@ namespace ShopAppBackend.Controllers
                 return Unauthorized();
             }
 
-            var promotion = await _context.Promotion.Select(pro => new PromotionDetailDTO()
+            var promotion = await _context.Promotion.Select(pro => new PromotionDetailDto()
             {
                 Id = pro.Id,
                 Description = pro.Description,
                 IsBroadcasted = pro.IsBroadcasted,
                 Name = pro.Name,
-                PromotionItems = (ICollection<ProductDetailPromotionDTO>)pro.PromotionItems
+                PromotionItems = (ICollection<ProductDetailPromotionDto>)pro.PromotionItems
                     .Where(pi => pi.InPromotionProduct.IsVisible && !pi.InPromotionProduct.Archived)
-                    .Select(pi => new ProductDetailPromotionDTO
+                    .Select(pi => new ProductDetailPromotionDto
                     {
                         Id = pi.InPromotionProduct.Id,
                         Name = pi.InPromotionProduct.Name,
@@ -104,7 +105,7 @@ namespace ShopAppBackend.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<Promotion>> PostPromotion(PromotionFormDTO promotion)
+        public async Task<ActionResult<Promotion>> PostPromotion(PromotionFormDto promotion)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
@@ -121,15 +122,15 @@ namespace ShopAppBackend.Controllers
             _context.Promotion.Add(newPromotion);
             var promotionItems = new List<PromotionItem>();
             var products = new List<Product>();
-            foreach (PromotionItemsDTO promotionItemDTO in promotion.PromotionItems)
+            foreach (PromotionItemsDto promotionItemDto in promotion.PromotionItems)
             {
-                var product = new Product { Id = promotionItemDTO.ProductId };
+                var product = new Product { Id = promotionItemDto.ProductId };
                 products.Add(product);
                 var promotionItem = new PromotionItem
                 {
                     Promotion = newPromotion,
                     InPromotionProduct = product,
-                    NewPrice = promotionItemDTO.NewPrice
+                    NewPrice = promotionItemDto.NewPrice
                 };
 
                 promotionItems.Add(promotionItem);
@@ -144,7 +145,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Promotion>> PutPromotion(int id, PromotionFormDTO promotion)
+        public async Task<ActionResult<Promotion>> PutPromotion(int id, PromotionFormDto promotion)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
 
@@ -169,15 +170,15 @@ namespace ShopAppBackend.Controllers
 
             var promotionItems = new List<PromotionItem>();
             var products = new List<Product>();
-            foreach (PromotionItemsDTO promotionItemDTO in promotion.PromotionItems)
+            foreach (PromotionItemsDto promotionItemDto in promotion.PromotionItems)
             {
-                var product = new Product { Id = promotionItemDTO.ProductId };
+                var product = new Product { Id = promotionItemDto.ProductId };
                 products.Add(product);
                 var promotionItem = new PromotionItem
                 {
                     Promotion = newPromotion,
                     InPromotionProduct = product,
-                    NewPrice = promotionItemDTO.NewPrice
+                    NewPrice = promotionItemDto.NewPrice
                 };
 
                 promotionItems.Add(promotionItem);

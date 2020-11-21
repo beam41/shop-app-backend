@@ -1,6 +1,6 @@
 ﻿namespace ShopAppBackend.Settings
 {
-    public class UserSettings : IUserSettings
+    public interface IUserSettings
     {
         public string Secret { get; set; }
 

@@ -54,7 +54,7 @@ namespace ShopAppBackend.Controllers
                     Price = p.Price,
                     NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived).NewPrice,
                     ImageUrl = p.ProductImages
-                        .Select(pi => new ProductImageUrlDTO
+                        .Select(pi => new ImageUrlDTO
                         {
                             Id = pi.Id,
                             ImageUrl = _imageService.GetImageUrl(pi.ImageFileName)
@@ -82,7 +82,7 @@ namespace ShopAppBackend.Controllers
                     Price = p.Price,
                     NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived).NewPrice,
                     ImageUrl = p.ProductImages
-                        .Select(pi => new ProductImageUrlDTO
+                        .Select(pi => new ImageUrlDTO
                         {
                             Id = pi.Id,
                             ImageUrl = _imageService.GetImageUrl(pi.ImageFileName)
@@ -115,7 +115,7 @@ namespace ShopAppBackend.Controllers
                             Price = p.Price,
                             NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived).NewPrice,
                             ImageUrl = p.ProductImages
-                                .Select(pi => new ProductImageUrlDTO
+                                .Select(pi => new ImageUrlDTO
                                 {
                                     Id = pi.Id,
                                     ImageUrl = _imageService.GetImageUrl(pi.ImageFileName)
@@ -148,7 +148,7 @@ namespace ShopAppBackend.Controllers
                             Price = pro.InPromotionProduct.Price,
                             NewPrice = pro.NewPrice,
                             ImageUrl = pro.InPromotionProduct.ProductImages
-                                .Select(pi => new ProductImageUrlDTO
+                                .Select(pi => new ImageUrlDTO
                                 {
                                     Id = pi.Id,
                                     ImageUrl = _imageService.GetImageUrl(pi.ImageFileName)
@@ -172,8 +172,8 @@ namespace ShopAppBackend.Controllers
                     Name = p.Name,
                     Price = p.Price,
                     NewPrice = p.PromotionItems.FirstOrDefault(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived).NewPrice,
-                    ImageUrls = (ICollection<ProductImageUrlDTO>)p.ProductImages
-                        .Select(pi => new ProductImageUrlDTO
+                    ImageUrls = (ICollection<ImageUrlDTO>)p.ProductImages
+                        .Select(pi => new ImageUrlDTO
                         {
                             Id = pi.Id,
                             ImageUrl = _imageService.GetImageUrl(pi.ImageFileName)
@@ -230,8 +230,8 @@ namespace ShopAppBackend.Controllers
                     Id = p.Id,
                     Name = p.Name,
                     Price = p.Price,
-                    Images = (ICollection<ProductImageUrlDTO>)p.ProductImages
-                        .Select(pi => new ProductImageUrlDTO
+                    Images = (ICollection<ImageUrlDTO>)p.ProductImages
+                        .Select(pi => new ImageUrlDTO
                         {
                             Id = pi.Id,
                             ImageUrl = _imageService.GetImageUrl(pi.ImageFileName)

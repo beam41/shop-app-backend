@@ -13,7 +13,7 @@ namespace ShopAppBackend.Models
         public string ImageFileName { get; set; }
     }
 
-    public class ProductImageUrlDTO
+    public class ImageUrlDTO
     {
         public int Id { get; set; }
 

@@ -124,7 +124,7 @@ namespace ShopAppBackend.Models
 
         public double? NewPrice { get; set; }
 
-        public ICollection<ProductImageUrlDTO> ImageUrls { get; set; }
+        public ICollection<ImageUrlDTO> ImageUrls { get; set; }
 
         public string Description { get; set; }
 
@@ -162,7 +162,7 @@ namespace ShopAppBackend.Models
 
         public int TypeId { get; set; }
 
-        public ICollection<ProductImageUrlDTO> Images { get; set; }
+        public ICollection<ImageUrlDTO> Images { get; set; }
     }
 
     public class ProductDetailPromotionDTO

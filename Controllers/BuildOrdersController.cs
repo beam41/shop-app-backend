@@ -58,9 +58,49 @@ namespace ShopAppBackend.Controllers
 
         // GET: api/BuildOrders/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<BuildOrder>> GetBuildOrder(int id)
+        public async Task<ActionResult<BuildOrderViewDTO>> GetBuildOrder(int id)
         {
-            var buildOrder = await _context.BuildOrder.FindAsync(id);
+            int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out int tokenId);
+
+            var buildOrder = await _context.BuildOrder
+                .Where(o => tokenId == 1 || o.CreatedByUser.Id == tokenId)
+                .Select(o => new BuildOrderViewDTO
+                {
+                    Id = o.Id,
+                    DistributionMethod = o.DistributionMethod,
+                    OrderStates = (ICollection<OrderStateDTO>)o.OrderStates.Select(os => new OrderStateDTO
+                    {
+                        Id = os.Id,
+                        CreatedAt = os.CreatedAt,
+                        State = os.State,
+                    }).OrderBy(os => os.CreatedAt),
+                    TrackingNumber = o.TrackingNumber,
+                    FullName = o.FullName,
+                    Address = o.Address,
+                    Province = o.Province,
+                    District = o.District,
+                    SubDistrict = o.SubDistrict,
+                    PostalCode = o.PostalCode,
+                    PhoneNumber = o.PhoneNumber,
+                    ProofOfPaymentFullImage = o.ProofOfPaymentFullImage.Length > 0 ? _imageService.GetImageUrl(o.ProofOfPaymentFullImage) : null,
+                    ProofOfPaymentDepositImage = o.ProofOfPaymentDepositImage.Length > 0 ? _imageService.GetImageUrl(o.ProofOfPaymentDepositImage) : null,
+                    ReceivedMessage = o.ReceivedMessage,
+                    CancelledByAdmin = o.CancelledByAdmin,
+                    CancelledReason = o.CancelledReason,
+                    CreatedByUser = tokenId == 1 ? new User { Id = o.CreatedByUser.Id, Username = o.CreatedByUser.Username, FullName = o.CreatedByUser.FullName } : null,
+                    DepositPrice = o.DepositPrice,
+                    FullPrice = o.FullPrice,
+                    ExpectedCompleteDate = o.ExpectedCompleteDate,
+                    AddressFullName = o.AddressFullName,
+                    AddressPhoneNumber = o.AddressPhoneNumber,
+                    DescriptionImagesUrl = (ICollection<ImageUrlDTO>) o.DescriptionImages.Select(im => new ImageUrlDTO()
+                    {
+                        Id = im.Id,
+                        ImageUrl = _imageService.GetImageUrl(im.ImageFileName)
+                    }),
+                    OrderDescription = o.OrderDescription
+                })
+                .FirstOrDefaultAsync(o => o.Id == id);
 
             if (buildOrder == null)
             {

@@ -88,7 +88,6 @@ namespace ShopAppBackend.Controllers
                 .ToListAsync();
         }
 
-        // GET: api/Orders/5
         [HttpGet("{id}")]
         public async Task<ActionResult<OrderViewDto>> GetOrder(int id)
         {

@@ -30,6 +30,8 @@
     <Compile Remove="Migrations\20201115090426_RemoveDefault.Designer.cs" />
     <Compile Remove="Migrations\20201116110539_NewField.cs" />
     <Compile Remove="Migrations\20201116110539_NewField.Designer.cs" />
+    <Compile Remove="Migrations\20201122081434_RemaneCreatedDate.cs" />
+    <Compile Remove="Migrations\20201122081434_RemaneCreatedDate.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

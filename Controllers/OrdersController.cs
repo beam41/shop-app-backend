@@ -43,7 +43,7 @@ namespace ShopAppBackend.Controllers
             return await _context.Order
                 .Where(o => o
                         .OrderStates
-                        .OrderByDescending(os => os.CreatedAt)
+                        .OrderByDescending(os => os.CreatedDate)
                         .First()
                         .State == stateEnum
                 )
@@ -61,8 +61,8 @@ namespace ShopAppBackend.Controllers
                     PurchaseMethod = o.PurchaseMethod,
                     TotalPrice = o.OrderProducts.Sum(op => (op.SavedNewPrice ?? op.SavedPrice) * op.Amount) +
                                  o.DistributionMethod.Price,
-                    CreatedDate = o.OrderStates.Min(os => os.CreatedAt),
-                    UpdatedDate = o.OrderStates.Max(os => os.CreatedAt)
+                    CreatedDate = o.OrderStates.Min(os => os.CreatedDate),
+                    UpdatedDate = o.OrderStates.Max(os => os.CreatedDate)
                 })
                 .ToListAsync();
         }
@@ -80,8 +80,8 @@ namespace ShopAppBackend.Controllers
                     ProductsName = (ICollection<string>) o.OrderProducts.Select(op => op.Product.Name),
                     TotalPrice = o.OrderProducts.Sum(op => (op.SavedNewPrice ?? op.SavedPrice) * op.Amount) +
                                  o.DistributionMethod.Price,
-                    UpdatedDate = o.OrderStates.Max(os => os.CreatedAt),
-                    State = o.OrderStates.OrderByDescending(os => os.CreatedAt).First().State,
+                    UpdatedDate = o.OrderStates.Max(os => os.CreatedDate),
+                    State = o.OrderStates.OrderByDescending(os => os.CreatedDate).First().State,
                     PurchaseMethod = o.PurchaseMethod
                 })
                 .OrderByDescending(os => os.UpdatedDate)
@@ -103,7 +103,7 @@ namespace ShopAppBackend.Controllers
                     OrderStates = (ICollection<OrderStateDto>) o.OrderStates.Select(os => new OrderStateDto
                     {
                         Id = os.Id,
-                        CreatedAt = os.CreatedAt,
+                        CreatedAt = os.CreatedDate,
                         State = os.State
                     }).OrderBy(os => os.CreatedAt),
                     Products = (ICollection<ProductOrderDetailDto>) o.OrderProducts.Select(op =>
@@ -217,7 +217,7 @@ namespace ShopAppBackend.Controllers
                 o.Id == id &&
                 o.CreatedByUser.Id == tokenId &&
                 o.OrderStates
-                    .OrderByDescending(os => os.CreatedAt)
+                    .OrderByDescending(os => os.CreatedDate)
                     .First()
                     .State == OrderStateEnum.Created
             ).FirstOrDefaultAsync();
@@ -252,7 +252,7 @@ namespace ShopAppBackend.Controllers
             var order = await _context.Order.Where(o =>
                 o.Id == id &&
                 o.OrderStates
-                    .OrderByDescending(os => os.CreatedAt)
+                    .OrderByDescending(os => os.CreatedDate)
                     .First()
                     .State == OrderStateEnum.AddedProofOfPaymentFull
             ).FirstOrDefaultAsync();
@@ -283,7 +283,7 @@ namespace ShopAppBackend.Controllers
             var order = await _context.Order.Where(o =>
                 o.Id == id &&
                 o.OrderStates
-                    .OrderByDescending(os => os.CreatedAt)
+                    .OrderByDescending(os => os.CreatedDate)
                     .First()
                     .State == (o.PurchaseMethod == PurchaseMethodEnum.Bank
                     ? OrderStateEnum.ApprovedProofOfPaymentFull
@@ -317,7 +317,7 @@ namespace ShopAppBackend.Controllers
                 o.Id == id &&
                 o.CreatedByUser.Id == tokenId &&
                 o.OrderStates
-                    .OrderByDescending(os => os.CreatedAt)
+                    .OrderByDescending(os => os.CreatedDate)
                     .First()
                     .State == OrderStateEnum.Sent
             ).FirstOrDefaultAsync();
@@ -377,7 +377,7 @@ namespace ShopAppBackend.Controllers
                 o.Id == id &&
                 o.CreatedByUser.Id == tokenId &&
                 o.OrderStates
-                    .OrderByDescending(os => os.CreatedAt)
+                    .OrderByDescending(os => os.CreatedDate)
                     .First()
                     .State == OrderStateEnum.Created
             ).FirstOrDefaultAsync();

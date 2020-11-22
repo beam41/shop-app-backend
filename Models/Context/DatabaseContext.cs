@@ -36,7 +36,7 @@ namespace ShopAppBackend.Models.Context
                 .IsUnique();
 
             modelBuilder.Entity<OrderState>()
-                .Property(os => os.CreatedAt)
+                .Property(os => os.CreatedDate)
                 .HasDefaultValueSql("getdate()");
 
             modelBuilder.Entity<Product>()

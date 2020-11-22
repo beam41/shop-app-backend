@@ -473,13 +473,7 @@ namespace ShopAppBackend.Controllers
                 .State == OrderStateEnum.Created;
 
             // updating
-            order.OrderStates = new List<OrderState>
-            {
-                new OrderState
-                {
-                    State = isUnableToBuilt ? OrderStateEnum.IsUnableToBuilt : OrderStateEnum.Cancelled
-                }
-            };
+            order.OrderStates.Add(new OrderState { State = OrderStateEnum.Cancelled });
 
             order.CancelledByAdmin = true;
             order.CancelledReason = data.Reason;

@@ -95,9 +95,9 @@ namespace ShopAppBackend.Controllers
                     OrderStates = (ICollection<OrderStateDto>) o.OrderStates.Select(os => new OrderStateDto
                     {
                         Id = os.Id,
-                        CreatedAt = os.CreatedDate,
+                        CreatedDate = os.CreatedDate,
                         State = os.State
-                    }).OrderBy(os => os.CreatedAt),
+                    }).OrderBy(os => os.CreatedDate),
                     TrackingNumber = o.TrackingNumber,
                     FullName = o.FullName,
                     Address = o.Address,

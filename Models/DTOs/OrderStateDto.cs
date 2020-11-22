@@ -9,6 +9,6 @@ namespace ShopAppBackend.Models.DTOs
 
         public OrderStateEnum State { get; set; }
 
-        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
     }
 }

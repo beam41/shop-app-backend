@@ -463,7 +463,8 @@ namespace ShopAppBackend.Controllers
 
             if (tokenId != 1) return Unauthorized();
 
-            var order = await _context.BuildOrder.Include(o => o.OrderStates).Where(o => o.Id == id).FirstOrDefaultAsync();
+            var order = await _context.BuildOrder.Include(o => o.OrderStates).Where(o => o.Id == id)
+                .FirstOrDefaultAsync();
 
             if (order == null) return NotFound();
 
@@ -473,7 +474,8 @@ namespace ShopAppBackend.Controllers
                 .State == OrderStateEnum.Created;
 
             // updating
-            order.OrderStates.Add(new OrderState { State = OrderStateEnum.Cancelled });
+            order.OrderStates.Add(new OrderState
+                { State = isUnableToBuilt ? OrderStateEnum.IsUnableToBuilt : OrderStateEnum.Cancelled });
 
             order.CancelledByAdmin = true;
             order.CancelledReason = data.Reason;

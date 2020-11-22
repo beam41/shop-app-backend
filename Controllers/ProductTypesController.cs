@@ -66,11 +66,11 @@ namespace ShopAppBackend.Controllers
 
             var productType = await _context.ProductType
                 .Where(pt => !pt.Archived)
-                .Select(p => new ProductTypeDetailDto
+                .Select(pt => new ProductTypeDetailDto
                 {
-                    Id = p.Id,
-                    Name = p.Name,
-                    ProductList = (ICollection<ProductListInTypeDto>) p.Products
+                    Id = pt.Id,
+                    Name = pt.Name,
+                    ProductList = (ICollection<ProductListInTypeDto>) pt.Products
                         .Where(p => !p.Archived)
                         .Select(pro => new ProductListInTypeDto
                         {

@@ -34,7 +34,7 @@ namespace ShopAppBackend.Controllers
                     Id = p.Id,
                     IsBroadcasted = p.IsBroadcasted,
                     Name = p.Name,
-                    ItemsCount = p.PromotionItems.Count(p => !p.InPromotionProduct.Archived)
+                    ItemsCount = p.PromotionItems.Count(pi => !pi.InPromotionProduct.Archived)
                 }).ToListAsync();
         }
 
@@ -203,11 +203,6 @@ namespace ShopAppBackend.Controllers
                 .AnyAsync(pi =>
                     pi.Promotion.IsBroadcasted && !pi.Promotion.Archived && pi.Promotion.Id != promotionId &&
                     productId.Contains(pi.InPromotionProduct.Id));
-        }
-
-        private Task<bool> PromotionExists(int id)
-        {
-            return _context.Promotion.AnyAsync(e => e.Id == id);
         }
     }
 }

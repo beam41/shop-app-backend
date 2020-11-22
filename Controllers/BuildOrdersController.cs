@@ -179,8 +179,8 @@ namespace ShopAppBackend.Controllers
             return CreatedAtAction("GetBuildOrder", new { id = newBuildOrder.Id }, newBuildOrder);
         }
 
-        [HttpPut("{id}/able-to-built")]
-        public async Task<ActionResult> AbleToBuilt(int id, BuildOrderIsAbleToBuiltDto data)
+        [HttpPut("{id}/is-able-to-built")]
+        public async Task<ActionResult> IsAbleToBuilt(int id, BuildOrderIsAbleToBuiltDto data)
         {
             // verifying
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
@@ -202,19 +202,12 @@ namespace ShopAppBackend.Controllers
             {
                 new OrderState
                 {
-                    State = data.IsAbleToBuilt ? OrderStateEnum.IsAbleToBuilt : OrderStateEnum.IsUnableToBuilt
+                    State = OrderStateEnum.IsAbleToBuilt
                 }
             };
 
-            if (data.IsAbleToBuilt)
-            {
-                buildOrder.DepositPrice = data.DepositPrice;
-                buildOrder.FullPrice = data.FullPrice;
-            }
-            else
-            {
-                buildOrder.CancelledReason = data.RejectedReason;
-            }
+            buildOrder.DepositPrice = data.DepositPrice;
+            buildOrder.FullPrice = data.FullPrice;
 
             await _context.SaveChangesAsync();
             return NoContent();
@@ -470,16 +463,21 @@ namespace ShopAppBackend.Controllers
 
             if (tokenId != 1) return Unauthorized();
 
-            var order = await _context.BuildOrder.Where(o => o.Id == id).FirstOrDefaultAsync();
+            var order = await _context.BuildOrder.Include(o => o.OrderStates).Where(o => o.Id == id).FirstOrDefaultAsync();
 
             if (order == null) return NotFound();
+
+            var isUnableToBuilt = order.OrderStates
+                .OrderByDescending(os => os.CreatedDate)
+                .First()
+                .State == OrderStateEnum.Created;
 
             // updating
             order.OrderStates = new List<OrderState>
             {
                 new OrderState
                 {
-                    State = OrderStateEnum.Cancelled
+                    State = isUnableToBuilt ? OrderStateEnum.IsUnableToBuilt : OrderStateEnum.Cancelled
                 }
             };
 

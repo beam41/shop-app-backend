@@ -6,35 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Migrations\20200905145148_Initialize.cs" />
-    <Compile Remove="Migrations\20200905145148_Initialize.Designer.cs" />
-    <Compile Remove="Migrations\20200905145327_Initialize.cs" />
-    <Compile Remove="Migrations\20200905145327_Initialize.Designer.cs" />
-    <Compile Remove="Migrations\20200905151728_Initialize.cs" />
-    <Compile Remove="Migrations\20200905151728_Initialize.Designer.cs" />
-    <Compile Remove="Migrations\20200905160155_Product.cs" />
-    <Compile Remove="Migrations\20200905160155_Product.Designer.cs" />
-    <Compile Remove="Migrations\20200905160426_Product.cs" />
-    <Compile Remove="Migrations\20200905160426_Product.Designer.cs" />
-    <Compile Remove="Migrations\20200906063902_Promotion.cs" />
-    <Compile Remove="Migrations\20200906063902_Promotion.Designer.cs" />
-    <Compile Remove="Migrations\20200907133957_Rename-Product-image.cs" />
-    <Compile Remove="Migrations\20200907133957_Rename-Product-image.Designer.cs" />
-    <Compile Remove="Migrations\20200915165635_AddOrder.cs" />
-    <Compile Remove="Migrations\20200915165635_AddOrder.Designer.cs" />
-    <Compile Remove="Migrations\20201109064407_Serial.cs" />
-    <Compile Remove="Migrations\20201109064407_Serial.Designer.cs" />
-    <Compile Remove="Migrations\20201115085254_BuildOrder.cs" />
-    <Compile Remove="Migrations\20201115085254_BuildOrder.Designer.cs" />
-    <Compile Remove="Migrations\20201115090426_RemoveDefault.cs" />
-    <Compile Remove="Migrations\20201115090426_RemoveDefault.Designer.cs" />
-    <Compile Remove="Migrations\20201116110539_NewField.cs" />
-    <Compile Remove="Migrations\20201116110539_NewField.Designer.cs" />
-    <Compile Remove="Migrations\20201122081434_RemaneCreatedDate.cs" />
-    <Compile Remove="Migrations\20201122081434_RemaneCreatedDate.Designer.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Azure.Storage.Blobs" Version="12.6.0" />
     <PackageReference Include="Flurl" Version="2.8.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.7" />

@@ -71,9 +71,9 @@ namespace ShopAppBackend.Controllers
 
         [AllowAnonymous]
         [HttpGet("check-exist")]
-        public async Task<ActionResult> CheckUserExist()
+        public async Task<ActionResult> CheckUserExist([FromQuery] string username)
         {
-            if (await UserExist(Request.Query["username"])) return Ok(new { result = true });
+            if (await UserExist(username)) return Ok(new { result = true });
 
             return Ok(new { result = false });
         }
@@ -136,7 +136,6 @@ namespace ShopAppBackend.Controllers
 
             return user;
         }
-
 
         [HttpPut("{id}")]
         public async Task<IActionResult> EditUser(int id, UserEditDto userInfo)

@@ -13,7 +13,7 @@ namespace ShopAppBackend.Models
         public User CreatedByUser { get; set; }
 
         [Required]
-        public ICollection<OrderState> OrderStates { get; set; }
+        public ICollection<BuildOrderState> OrderStates { get; set; }
 
         public DistributionMethod DistributionMethod { get; set; }
 

@@ -10,8 +10,8 @@ using ShopAppBackend.Models.Context;
 namespace ShopAppBackend.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20201122164828_Initial")]
-    partial class Initial
+    [Migration("20201203181038_BuildOrderStateAndOnDelete")]
+    partial class BuildOrderStateAndOnDelete
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -125,6 +125,35 @@ namespace ShopAppBackend.Migrations
                     b.HasIndex("BuildOrderId");
 
                     b.ToTable("BuildOrderImage");
+                });
+
+            modelBuilder.Entity("ShopAppBackend.Models.BuildOrderState", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("BuildOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("varchar(33)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BuildOrderId");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("BuildOrderState");
                 });
 
             modelBuilder.Entity("ShopAppBackend.Models.DistributionMethod", b =>
@@ -259,9 +288,6 @@ namespace ShopAppBackend.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("BuildOrderId")
-                        .HasColumnType("int");
-
                     b.Property<DateTimeOffset>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetimeoffset")
@@ -275,8 +301,6 @@ namespace ShopAppBackend.Migrations
                         .HasColumnType("varchar(33)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BuildOrderId");
 
                     b.HasIndex("OrderId");
 
@@ -494,7 +518,8 @@ namespace ShopAppBackend.Migrations
 
                     b.HasOne("ShopAppBackend.Models.DistributionMethod", "DistributionMethod")
                         .WithMany("BuildOrders")
-                        .HasForeignKey("DistributionMethodId");
+                        .HasForeignKey("DistributionMethodId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("ShopAppBackend.Models.BuildOrderImage", b =>
@@ -504,6 +529,18 @@ namespace ShopAppBackend.Migrations
                         .HasForeignKey("BuildOrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("ShopAppBackend.Models.BuildOrderState", b =>
+                {
+                    b.HasOne("ShopAppBackend.Models.BuildOrder", "BuildOrder")
+                        .WithMany("OrderStates")
+                        .HasForeignKey("BuildOrderId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("ShopAppBackend.Models.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId");
                 });
 
             modelBuilder.Entity("ShopAppBackend.Models.Order", b =>
@@ -517,7 +554,7 @@ namespace ShopAppBackend.Migrations
                     b.HasOne("ShopAppBackend.Models.DistributionMethod", "DistributionMethod")
                         .WithMany("Orders")
                         .HasForeignKey("DistributionMethodId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -525,7 +562,8 @@ namespace ShopAppBackend.Migrations
                 {
                     b.HasOne("ShopAppBackend.Models.Order", "Order")
                         .WithMany("OrderProducts")
-                        .HasForeignKey("OrderId");
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("ShopAppBackend.Models.Product", "Product")
                         .WithMany()
@@ -534,13 +572,10 @@ namespace ShopAppBackend.Migrations
 
             modelBuilder.Entity("ShopAppBackend.Models.OrderState", b =>
                 {
-                    b.HasOne("ShopAppBackend.Models.BuildOrder", "BuildOrder")
-                        .WithMany("OrderStates")
-                        .HasForeignKey("BuildOrderId");
-
                     b.HasOne("ShopAppBackend.Models.Order", "Order")
                         .WithMany("OrderStates")
-                        .HasForeignKey("OrderId");
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("ShopAppBackend.Models.Product", b =>

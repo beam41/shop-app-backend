@@ -197,11 +197,13 @@ namespace ShopAppBackend.Controllers
                     productId.Contains(pi.InPromotionProduct.Id));
         }
 
-        private Task<bool> ProductPromotionIsActive(IEnumerable<int> productId, int promotionId)
+        private Task<bool> ProductPromotionIsActive(IEnumerable<int> productId, int ignorePromotionId)
         {
             return _context.PromotionItem
                 .AnyAsync(pi =>
-                    pi.Promotion.IsBroadcasted && !pi.Promotion.Archived && pi.Promotion.Id != promotionId &&
+                    pi.Promotion.IsBroadcasted &&
+                    !pi.Promotion.Archived &&
+                    pi.Promotion.Id != ignorePromotionId &&
                     productId.Contains(pi.InPromotionProduct.Id));
         }
     }

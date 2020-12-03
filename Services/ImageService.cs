@@ -52,7 +52,7 @@ namespace ShopAppBackend.Services
             return fileName;
         }
 
-        public async Task ConvertImg(Stream input, Stream output, bool doCompress)
+        private async Task ConvertImg(Stream input, Stream output, bool doCompress)
         {
             input.Position = 0;
 

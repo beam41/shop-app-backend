@@ -152,7 +152,7 @@ namespace ShopAppBackend.Controllers
             var newBuildOrder = new BuildOrder
             {
                 CreatedByUser = user,
-                OrderStates = new List<OrderState> { new OrderState { State = OrderStateEnum.Created } },
+                OrderStates = new List<BuildOrderState> { new BuildOrderState { State = OrderStateEnum.Created } },
                 FullName = buildOrder.FullName,
                 PhoneNumber = buildOrder.PhoneNumber,
                 OrderDescription = buildOrder.OrderDescription,
@@ -198,9 +198,9 @@ namespace ShopAppBackend.Controllers
             if (buildOrder == null) return NotFound();
 
             // updating
-            buildOrder.OrderStates = new List<OrderState>
+            buildOrder.OrderStates = new List<BuildOrderState>
             {
-                new OrderState
+                new BuildOrderState
                 {
                     State = OrderStateEnum.IsAbleToBuilt
                 }
@@ -233,9 +233,9 @@ namespace ShopAppBackend.Controllers
             // updating
             var fileName = await _imageService.Uploader(data.Image, false);
 
-            buildOrder.OrderStates = new List<OrderState>
+            buildOrder.OrderStates = new List<BuildOrderState>
             {
-                new OrderState
+                new BuildOrderState
                 {
                     State = OrderStateEnum.AddedProofOfPaymentDeposit
                 }
@@ -267,9 +267,9 @@ namespace ShopAppBackend.Controllers
             if (buildOrder == null) return NotFound();
 
             // updating
-            buildOrder.OrderStates = new List<OrderState>
+            buildOrder.OrderStates = new List<BuildOrderState>
             {
-                new OrderState
+                new BuildOrderState
                 {
                     State = OrderStateEnum.ApprovedProofOfPaymentDeposit
                 }
@@ -300,9 +300,9 @@ namespace ShopAppBackend.Controllers
             if (buildOrder == null) return NotFound();
 
             // updating
-            buildOrder.OrderStates = new List<OrderState>
+            buildOrder.OrderStates = new List<BuildOrderState>
             {
-                new OrderState
+                new BuildOrderState
                 {
                     State = OrderStateEnum.BuiltComplete
                 }
@@ -334,9 +334,9 @@ namespace ShopAppBackend.Controllers
             // updating
             var fileName = await _imageService.Uploader(data.Image, false);
 
-            order.OrderStates = new List<OrderState>
+            order.OrderStates = new List<BuildOrderState>
             {
-                new OrderState
+                new BuildOrderState
                 {
                     State = OrderStateEnum.AddedProofOfPaymentFull
                 }
@@ -378,9 +378,9 @@ namespace ShopAppBackend.Controllers
             if (order == null) return NotFound();
 
             // updating
-            order.OrderStates = new List<OrderState>
+            order.OrderStates = new List<BuildOrderState>
             {
-                new OrderState
+                new BuildOrderState
                 {
                     State = OrderStateEnum.ApprovedProofOfPaymentFull
                 }
@@ -409,9 +409,9 @@ namespace ShopAppBackend.Controllers
             if (order == null) return NotFound();
 
             // updating
-            order.OrderStates = new List<OrderState>
+            order.OrderStates = new List<BuildOrderState>
             {
-                new OrderState
+                new BuildOrderState
                 {
                     State = OrderStateEnum.Sent
                 }
@@ -441,9 +441,9 @@ namespace ShopAppBackend.Controllers
             if (order == null) return NotFound();
 
             // updating
-            order.OrderStates = new List<OrderState>
+            order.OrderStates = new List<BuildOrderState>
             {
-                new OrderState
+                new BuildOrderState
                 {
                     State = OrderStateEnum.Received
                 }
@@ -474,8 +474,8 @@ namespace ShopAppBackend.Controllers
                 .State == OrderStateEnum.Created;
 
             // updating
-            order.OrderStates.Add(new OrderState
-                { State = isUnableToBuilt ? OrderStateEnum.IsUnableToBuilt : OrderStateEnum.Cancelled });
+            order.OrderStates.Add(new BuildOrderState
+            { State = isUnableToBuilt ? OrderStateEnum.IsUnableToBuilt : OrderStateEnum.Cancelled });
 
             order.CancelledByAdmin = true;
             order.CancelledReason = data.Reason;
@@ -507,9 +507,9 @@ namespace ShopAppBackend.Controllers
             if (order == null) return NotFound();
 
             // updating
-            order.OrderStates = new List<OrderState>
+            order.OrderStates = new List<BuildOrderState>
             {
-                new OrderState
+                new BuildOrderState
                 {
                     State = OrderStateEnum.Cancelled
                 }

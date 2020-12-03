@@ -30,10 +30,8 @@ namespace ShopAppBackend.Controllers
 
         [HttpGet("recommend")]
         [AllowAnonymous]
-        public async Task<ActionResult<IEnumerable<ProductDisplayDto>>> GetRecommend()
+        public async Task<ActionResult<IEnumerable<ProductDisplayDto>>> GetRecommend([FromQuery] int amount)
         {
-            if (!int.TryParse(Request.Query["amount"], out var amount)) return BadRequest();
-
             return await _context.Product
                 .Where(p => p.IsVisible && !p.Archived)
                 .Select(p => new ProductDisplayDto
@@ -87,10 +85,8 @@ namespace ShopAppBackend.Controllers
 
         [HttpGet("type")]
         [AllowAnonymous]
-        public async Task<ActionResult<IEnumerable<ProductTypeDisplayDto>>> GetAllTypeAndProduct()
+        public async Task<ActionResult<IEnumerable<ProductTypeDisplayDto>>> GetAllTypeAndProduct([FromQuery] int amount)
         {
-            if (!int.TryParse(Request.Query["amount"], out var amount)) return BadRequest();
-
             return await _context.ProductType
                 .Where(pt => !pt.Archived && pt.Products.Any(p => p.IsVisible && !p.Archived))
                 .Select(pt => new ProductTypeDisplayDto
@@ -246,19 +242,16 @@ namespace ShopAppBackend.Controllers
 
         [HttpGet("search")]
         [AllowAnonymous]
-        public async Task<ActionResult<List<ProductListDto>>> SearchProduct()
+        public async Task<ActionResult<List<ProductListDto>>> SearchProduct([FromQuery]string q)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
             if (tokenId != 1) return Unauthorized();
 
-            var query = Request.Query["q"];
-            if (StringValues.IsNullOrEmpty(query)) return BadRequest();
-
             var product = await _context.Product
                 .Where(p => !p.Archived &&
                             !p.PromotionItems.Any(pi => pi.Promotion.IsBroadcasted && !pi.Promotion.Archived) &&
-                            p.Name.Contains(query))
+                            p.Name.Contains(q))
                 .Select(p => new ProductListDto
                 {
                     Id = p.Id,

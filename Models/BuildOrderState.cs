@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Threading.Tasks;
 using ShopAppBackend.Enums;
 
 namespace ShopAppBackend.Models
 {
-    public class OrderState
+    public class BuildOrderState
     {
         public int Id { get; set; }
 
@@ -14,5 +17,7 @@ namespace ShopAppBackend.Models
         public DateTimeOffset CreatedDate { get; set; }
 
         public Order Order { get; set; }
+
+        public BuildOrder BuildOrder { get; set; }
     }
 }

@@ -16,8 +16,6 @@ namespace ShopAppBackend.Models
 
         public DateTimeOffset CreatedDate { get; set; }
 
-        public Order Order { get; set; }
-
         public BuildOrder BuildOrder { get; set; }
     }
 }

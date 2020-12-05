@@ -115,7 +115,7 @@ namespace ShopAppBackend.Migrations
                 name: "BuildOrder",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
+                    Id = table.Column<string>(type: "char(10)", maxLength: 10, nullable: false),
                     CreatedByUserId = table.Column<int>(nullable: false),
                     DistributionMethodId = table.Column<int>(nullable: true),
                     FullName = table.Column<string>(nullable: false),
@@ -159,7 +159,7 @@ namespace ShopAppBackend.Migrations
                 name: "Order",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
+                    Id = table.Column<string>(type: "char(10)", maxLength: 10, nullable: false),
                     CreatedByUserId = table.Column<int>(nullable: false),
                     PurchaseMethod = table.Column<string>(type: "varchar(11)", nullable: false),
                     DistributionMethodId = table.Column<int>(nullable: false),

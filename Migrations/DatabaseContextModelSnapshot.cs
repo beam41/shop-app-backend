@@ -22,7 +22,8 @@ namespace ShopAppBackend.Migrations
             modelBuilder.Entity("ShopAppBackend.Models.BuildOrder", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("char(10)")
+                        .HasMaxLength(10);
 
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
@@ -111,7 +112,7 @@ namespace ShopAppBackend.Migrations
 
                     b.Property<string>("BuildOrderId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("char(10)");
 
                     b.Property<string>("ImageFileName")
                         .IsRequired()
@@ -132,7 +133,7 @@ namespace ShopAppBackend.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("BuildOrderId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("char(10)");
 
                     b.Property<DateTimeOffset>("CreatedDate")
                         .ValueGeneratedOnAdd()
@@ -176,7 +177,8 @@ namespace ShopAppBackend.Migrations
             modelBuilder.Entity("ShopAppBackend.Models.Order", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("char(10)")
+                        .HasMaxLength(10);
 
                     b.Property<string>("Address")
                         .IsRequired()
@@ -253,7 +255,7 @@ namespace ShopAppBackend.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("OrderId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("char(10)");
 
                     b.Property<string>("ProductId")
                         .HasColumnType("nvarchar(450)");
@@ -286,7 +288,7 @@ namespace ShopAppBackend.Migrations
                         .HasDefaultValueSql("getdate()");
 
                     b.Property<string>("OrderId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("char(10)");
 
                     b.Property<string>("State")
                         .IsRequired()

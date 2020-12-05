@@ -7,6 +7,8 @@ namespace ShopAppBackend.Models
 {
     public class Order
     {
+        [Column(TypeName = "char(10)")]
+        [StringLength(10)]
         public string Id { get; set; }
 
         [Required]

@@ -189,7 +189,7 @@ namespace ShopAppBackend.Controllers
             return promotion;
         }
 
-        private Task<bool> ProductPromotionIsActive(IEnumerable<int> productId)
+        private Task<bool> ProductPromotionIsActive(IEnumerable<string> productId)
         {
             return _context.PromotionItem
                 .AnyAsync(pi =>
@@ -197,7 +197,7 @@ namespace ShopAppBackend.Controllers
                     productId.Contains(pi.InPromotionProduct.Id));
         }
 
-        private Task<bool> ProductPromotionIsActive(IEnumerable<int> productId, int ignorePromotionId)
+        private Task<bool> ProductPromotionIsActive(IEnumerable<string> productId, int ignorePromotionId)
         {
             return _context.PromotionItem
                 .AnyAsync(pi =>

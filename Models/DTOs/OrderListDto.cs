@@ -6,7 +6,7 @@ namespace ShopAppBackend.Models.DTOs
 {
     public class OrderListDto
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         public DateTimeOffset UpdatedDate { get; set; }
 

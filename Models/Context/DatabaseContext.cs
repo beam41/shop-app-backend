@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ShopAppBackend.Generators;
 
 namespace ShopAppBackend.Models.Context
 {
@@ -59,12 +60,25 @@ namespace ShopAppBackend.Models.Context
                 .Property(p => p.Archived)
                 .HasDefaultValue(false);
 
+            modelBuilder.Entity<Product>()
+                .Property(p => p.Id)
+                .ValueGeneratedNever();
+
+            modelBuilder.Entity<BuildOrder>()
+                .Property(p => p.Id)
+                .ValueGeneratedNever()
+                .HasValueGenerator<OrderIdGenerator>();
+
+            modelBuilder.Entity<Order>()
+                .Property(p => p.Id)
+                .ValueGeneratedNever()
+                .HasValueGenerator<OrderIdGenerator>();
+
             // product(M) and its Type(1)
             modelBuilder.Entity<Product>()
                 .HasOne(p => p.Type)
                 .WithMany(t => t.Products)
                 .OnDelete(DeleteBehavior.Cascade);
-                
 
             // product(1) and its image(M)
             modelBuilder.Entity<Product>()

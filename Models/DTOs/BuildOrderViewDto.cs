@@ -5,7 +5,7 @@ namespace ShopAppBackend.Models.DTOs
 {
     public class BuildOrderViewDto
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         public User CreatedByUser { get; set; }
 

@@ -5,7 +5,7 @@ namespace ShopAppBackend.Models.DTOs
 {
     public class OrderViewDto
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         public ICollection<ProductOrderDetailDto> Products { get; set; }
 

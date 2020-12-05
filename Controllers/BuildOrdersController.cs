@@ -82,7 +82,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<BuildOrderViewDto>> GetBuildOrder(int id)
+        public async Task<ActionResult<BuildOrderViewDto>> GetBuildOrder(string id)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
@@ -180,7 +180,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}/is-able-to-built")]
-        public async Task<ActionResult> IsAbleToBuilt(int id, BuildOrderIsAbleToBuiltDto data)
+        public async Task<ActionResult> IsAbleToBuilt(string id, BuildOrderIsAbleToBuiltDto data)
         {
             // verifying
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
@@ -214,7 +214,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}/add-proof-deposit")]
-        public async Task<ActionResult> AddedProofOfPaymentDeposit(int id, [FromForm] OrderAddProofOfPaymentDto data)
+        public async Task<ActionResult> AddedProofOfPaymentDeposit(string id, [FromForm] OrderAddProofOfPaymentDto data)
         {
             // verifying
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
@@ -248,7 +248,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}/approve-proof-deposit")]
-        public async Task<ActionResult> ApprovedProofOfPaymentDeposit(int id,
+        public async Task<ActionResult> ApprovedProofOfPaymentDeposit(string id,
             BuildOrderApprovedProofOfPaymentDepositDto data)
         {
             // verifying
@@ -282,7 +282,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}/built-complete")]
-        public async Task<ActionResult> BuiltComplete(int id)
+        public async Task<ActionResult> BuiltComplete(string id)
         {
             // verifying
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
@@ -314,7 +314,7 @@ namespace ShopAppBackend.Controllers
 
 
         [HttpPut("{id}/add-proof-full")]
-        public async Task<ActionResult> AddProofOfPaymentFull(int id,
+        public async Task<ActionResult> AddProofOfPaymentFull(string id,
             [FromForm] BuildOrderAddProofOfPaymentFullDto data)
         {
             // verifying
@@ -360,7 +360,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}/approve-proof-full")]
-        public async Task<ActionResult> ApproveProofOfPaymentFull(int id)
+        public async Task<ActionResult> ApproveProofOfPaymentFull(string id)
         {
             // verifying
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
@@ -391,7 +391,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}/sent")]
-        public async Task<ActionResult> Sent(int id, OrderSentDto data)
+        public async Task<ActionResult> Sent(string id, OrderSentDto data)
         {
             // verifying
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
@@ -424,7 +424,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}/received")]
-        public async Task<ActionResult> Received(int id, OrderReceivedDto data)
+        public async Task<ActionResult> Received(string id, OrderReceivedDto data)
         {
             // verifying
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
@@ -457,7 +457,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}/cancelled/admin")]
-        public async Task<ActionResult> Cancelled(int id, OrderCancelledDto data)
+        public async Task<ActionResult> Cancelled(string id, OrderCancelledDto data)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
@@ -485,7 +485,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}/cancelled/user")]
-        public async Task<ActionResult> Cancelled(int id)
+        public async Task<ActionResult> Cancelled(string id)
         {
             // verifying
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);

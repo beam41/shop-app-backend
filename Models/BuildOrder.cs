@@ -7,7 +7,7 @@ namespace ShopAppBackend.Models
 {
     public class BuildOrder
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         [Required]
         public User CreatedByUser { get; set; }

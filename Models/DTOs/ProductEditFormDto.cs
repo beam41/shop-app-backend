@@ -6,8 +6,6 @@ namespace ShopAppBackend.Models.DTOs
 {
     public class ProductEditFormDto
     {
-        public int Id { get; set; }
-
         [Required]
         public string Name { get; set; }
 

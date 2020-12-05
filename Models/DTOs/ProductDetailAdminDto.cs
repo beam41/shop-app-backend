@@ -4,7 +4,7 @@ namespace ShopAppBackend.Models.DTOs
 {
     public class ProductDetailAdminDto
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         public string Name { get; set; }
 

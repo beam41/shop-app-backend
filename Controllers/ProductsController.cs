@@ -151,7 +151,7 @@ namespace ShopAppBackend.Controllers
 
         [HttpGet("{id}")]
         [AllowAnonymous]
-        public async Task<ActionResult<ProductDetailDto>> GetProduct(int id)
+        public async Task<ActionResult<ProductDetailDto>> GetProduct(string id)
         {
             var product = await _context.Product
                 .Where(p => !p.Archived)
@@ -210,7 +210,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpGet("{id}/admin")]
-        public async Task<ActionResult<ProductDetailAdminDto>> GetProductAdmin(int id)
+        public async Task<ActionResult<ProductDetailAdminDto>> GetProductAdmin(string id)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
@@ -301,7 +301,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Product>> EditProduct(int id, [FromForm] ProductEditFormDto productEdit)
+        public async Task<ActionResult<Product>> EditProduct(string id, [FromForm] ProductEditFormDto productEdit)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 
@@ -348,7 +348,7 @@ namespace ShopAppBackend.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Product>> ArchiveProduct(int id)
+        public async Task<ActionResult<Product>> ArchiveProduct(string id)
         {
             int.TryParse(User.Claims.FirstOrDefault(claim => claim.Type == "Id")?.Value, out var tokenId);
 

@@ -39,6 +39,10 @@ namespace ShopAppBackend.Models.Context
                 .Property(os => os.CreatedDate)
                 .HasDefaultValueSql("getdate()");
 
+            modelBuilder.Entity<BuildOrderState>()
+                .Property(os => os.CreatedDate)
+                .HasDefaultValueSql("getdate()");
+
             modelBuilder.Entity<Product>()
                 .Property(p => p.Archived)
                 .HasDefaultValue(false);

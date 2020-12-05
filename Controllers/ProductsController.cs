@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Primitives;
 using ShopAppBackend.Models;
 using ShopAppBackend.Models.Context;
 using ShopAppBackend.Models.DTOs;
@@ -293,9 +292,24 @@ namespace ShopAppBackend.Controllers
 
             Task.WaitAll(fileNameList);
 
+            
+
             _context.Product.Add(newProduct);
 
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                if (await ProductExists(productAdd.Id))
+                {
+                    return BadRequest(new { Message = "duplicate"});
+                }
+
+                throw;
+            }
+            
             GC.Collect();
             return CreatedAtAction("GetProductAdmin", new { id = newProduct.Id }, newProduct);
         }
@@ -368,6 +382,11 @@ namespace ShopAppBackend.Controllers
             await _context.SaveChangesAsync();
 
             return product;
+        }
+
+        private Task<bool> ProductExists(string id)
+        {
+            return _context.Product.AnyAsync(e => e.Id == id);
         }
 
         private Task<bool> ProductTypeExists(string name)
